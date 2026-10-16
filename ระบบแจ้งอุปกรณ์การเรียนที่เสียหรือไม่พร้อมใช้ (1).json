@@ -1,0 +1,605 @@
+{
+  "name": "ระบบแจ้งอุปกรณ์การเรียนที่เสียหรือไม่พร้อมใช้",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "แจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้",
+        "formDescription": "แบบฟอร์มสำหรับแจ้งอุปกรณ์ที่เสียหรือไม่พร้อมใช้งาน",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "ชื่อผู้แจ้ง"
+            },
+            {
+              "fieldLabel": "อีเมล"
+            },
+            {
+              "fieldLabel": "ห้องเรียน"
+            },
+            {
+              "fieldLabel": "ประเภทอุปกรณ์"
+            },
+            {
+              "fieldLabel": "หมายเลขอุปกรณ์"
+            },
+            {
+              "fieldLabel": "อาการ/ปัญหาที่พบ",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "a1d8749c-d18d-484c-809a-19d9cf0dada1",
+      "name": "On form submission",
+      "webhookId": "28b63f1b-710d-4e34-8052-5ddd73e89529"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=คุณเป็นผู้ช่วยวิเคราะห์ปัญหาอุปกรณ์คอมพิวเตอร์และอุปกรณ์การเรียนของโรงเรียน\n\nหน้าที่ของคุณคือวิเคราะห์อาการเสียและเสนอแนวทางแก้ไขเบื้องต้นที่ปลอดภัย โดยไม่สรุปสาเหตุเกินกว่าหลักฐานที่มี\n\nข้อมูลการแจ้งซ่อม:\n- ชื่อผู้แจ้ง: {{ $json['ชื่อผู้แจ้ง'] }}\n- ประเภทอุปกรณ์: {{ $json['ประเภทอุปกรณ์'] }}\n- หมายเลขอุปกรณ์: {{ $json['หมายเลขอุปกรณ์'] }}\n- ห้องเรียนหรือสถานที่: {{ $json['ห้องเรียน'] }}\n- อาการหรือปัญหาที่พบ: {{ $json['อาการ/ปัญหาที่พบ'] }}\n\nให้วิเคราะห์ข้อมูลข้างต้น แล้วตอบกลับเป็น JSON ที่ถูกต้องเท่านั้น โดยมีคีย์ 3 รายการดังนี้\n\n{\n  \"ความเร่งด่วน\": \"สูง\",\n  \"สาเหตุ\": \"ระบุสาเหตุที่เป็นไปได้ หรือแจ้งว่ายังไม่สามารถยืนยันสาเหตุได้\",\n  \"แนวทางแก้ไขเบื้องต้น\": \"ระบุวิธีตรวจสอบหรือแก้ไขที่ปลอดภัย\"\n}\n\nเกณฑ์การประเมินความเร่งด่วน:\n- สูง: ปัญหากระทบการใช้งานหลายคน มีความเสี่ยงด้านความปลอดภัย หรือทำให้การเรียนการสอนหยุดชะงัก\n- ปานกลาง: อุปกรณ์ใช้งานไม่ได้ตามปกติ แต่ยังมีทางเลือกในการเรียนหรือใช้อุปกรณ์อื่น\n- ต่ำ: ปัญหาเล็กน้อยที่ไม่กระทบการใช้งานหลัก\n\nข้อกำหนด:\n- ค่า \"ความเร่งด่วน\" ต้องเป็น \"สูง\", \"ปานกลาง\" หรือ \"ต่ำ\" เท่านั้น\n- หากข้อมูลไม่เพียงพอ ให้ระบุข้อจำกัดตามจริง\n- ห้ามแต่งข้อมูลหรือยืนยันสาเหตุโดยไม่มีหลักฐาน\n- แนวทางแก้ไขต้องปลอดภัย และหากเกี่ยวข้องกับไฟฟ้าหรือการเปิดอุปกรณ์ ให้แนะนำให้เจ้าหน้าที่รับผิดชอบดำเนินการ\n- ต้องมีคีย์ทั้ง 3 รายการ และค่าทุกค่าต้องเป็นข้อความ\n- ห้ามใส่ Markdown code fence หรือข้อความอื่นนอก JSON\n- ต้องสร้างคำตอบจากข้อมูลที่ได้รับจริง ห้ามตอบเป็นข้อความว่าง",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        16,
+        0
+      ],
+      "id": "f7ad3404-9cc7-448b-a6b0-9a7e9bd514b2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.8-flash-lite-tts",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        176
+      ],
+      "id": "3a535cc4-b0a3-49ae-a684-dd2d105fc5d3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EWKNLOrtZiEB7Mmz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้ - สำหรับระบบ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ชื่อผู้แจ้ง": "={{ $('On form submission').item.json['ชื่อผู้แจ้ง'] }}",
+            "อีเมล": "={{ $('On form submission').item.json['อีเมล'] }}",
+            "สถานที่": "={{ $('On form submission').item.json['ห้องเรียน'] }}",
+            "อุปกรณ์": "={{ $('On form submission').item.json['หมายเลขอุปกรณ์'] }}",
+            "อาการเสีย": "={{ $('On form submission').item.json['อาการ/ปัญหาที่พบ'] }}",
+            "หมายเลขเครื่อง": "={{ $('On form submission').item.json['หมายเลขอุปกรณ์'] }}",
+            "ความเร่งด่วน": "={{ $('Code in JavaScript').item.json['ความเร่งด่วน'] }}",
+            "รายละเอียด": "={{ $('Code in JavaScript').item.json['รายละเอียด'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ชื่อผู้แจ้ง",
+              "displayName": "ชื่อผู้แจ้ง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "อีเมล",
+              "displayName": "อีเมล",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "อุปกรณ์",
+              "displayName": "อุปกรณ์",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "หมายเลขเครื่อง",
+              "displayName": "หมายเลขเครื่อง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "สถานที่",
+              "displayName": "สถานที่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "อาการเสีย",
+              "displayName": "อาการเสีย",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ความเร่งด่วน",
+              "displayName": "ความเร่งด่วน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "รายละเอียด",
+              "displayName": "รายละเอียด",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        -80
+      ],
+      "id": "89254423-2599-46ab-b68b-b2c43b561c84",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst form = $(\"On form submission\").first().json;\nconst ai = $input.first().json;\n\n// แปลงข้อมูลจาก AI\nfunction parseAI(value) {\n  if (value && typeof value === \"object\" && !Array.isArray(value)) {\n    return value;\n  }\n\n  if (typeof value !== \"string\" || !value.trim()) {\n    return {};\n  }\n\n  let text = value.trim()\n    .replace(/^```(?:json)?\\s*/i, \"\")\n    .replace(/\\s*```$/i, \"\")\n    .trim();\n\n  try {\n    return JSON.parse(text);\n  } catch (e) {\n    // ลองค้นหา JSON ที่อยู่ภายในข้อความ\n    const start = text.indexOf(\"{\");\n    const end = text.lastIndexOf(\"}\");\n\n    if (start !== -1 && end > start) {\n      try {\n        return JSON.parse(text.slice(start, end + 1));\n      } catch (e2) {\n        // ข้อความไม่ใช่ JSON ที่สมบูรณ์\n      }\n    }\n\n    return { \"ข้อความจาก AI\": text };\n  }\n}\n\n// รองรับผลลัพธ์จาก AI Agent หลายรูปแบบ\nlet raw = ai.output ?? ai.text ?? ai.response ?? ai;\nlet data = parseAI(raw);\n\nif (typeof data.output === \"string\") {\n  data = parseAI(data.output);\n} else if (\n  data.output &&\n  typeof data.output === \"object\"\n) {\n  data = data.output;\n}\n\nfunction pick(...values) {\n  for (const value of values) {\n    if (value !== undefined && value !== null &&\n        String(value).trim() !== \"\") {\n      return value;\n    }\n  }\n  return \"\";\n}\n\nconst ข้อความAI = pick(\n  data[\"ข้อความจาก AI\"],\n  data[\"output\"],\n  data[\"text\"],\n  typeof raw === \"string\" ? raw : \"\"\n);\n\nconst อาการเสีย = pick(\n  form[\"อาการ/ปัญหาที่พบ\"],\n  form[\"อาการเสีย\"],\n  data[\"อาการเสีย\"]\n);\n\nconst สาเหตุ = pick(\n  data[\"สาเหตุ\"],\n  data[\"สาเหตุที่คาดว่าเกิดขึ้น\"],\n  data[\"สาเหตุที่เป็นไปได้\"]\n);\n\nconst ความเร่งด่วน = pick(\n  data[\"ความเร่งด่วน\"],\n  data[\"ระดับความเร่งด่วน\"],\n  data[\"urgency\"],\n  data[\"priority\"],\n  ai[\"ความเร่งด่วน\"],\n  ai[\"ระดับความเร่งด่วน\"]\n);\n\nconst รายละเอียด = pick(\n  data[\"รายละเอียด\"],\n  data[\"แนวทางแก้ไขเบื้องต้น\"],\n  data[\"แนวทางแก้ไข\"],\n  data[\"วิธีแก้ไข\"],\n  data[\"ข้อเสนอแนะ\"],\n  data[\"คำแนะนำ\"],\n  data[\"รายละเอียดการแก้ไข\"],\n  ai[\"รายละเอียด\"],\n  ai[\"แนวทางแก้ไขเบื้องต้น\"]\n);\n\nreturn [{\n  json: {\n    \"ชื่อผู้แจ้ง\": form[\"ชื่อผู้แจ้ง\"] ?? \"\",\n    \"อีเมล\": form[\"อีเมล\"] ?? \"\",\n    \"อุปกรณ์\": pick(\n      form[\"ประเภทอุปกรณ์\"],\n      form[\"อุปกรณ์\"]\n    ),\n    \"หมายเลขเครื่อง\": pick(\n      form[\"หมายเลขอุปกรณ์\"],\n      form[\"หมายเลขเครื่อง\"]\n    ),\n    \"สถานที่\": pick(\n      form[\"ห้องเรียน\"],\n      form[\"สถานที่\"]\n    ),\n    \"อาการเสีย\": อาการเสีย,\n    \"สาเหตุ\": สาเหตุ,\n    \"ความเร่งด่วน\": ความเร่งด่วน,\n    \"รายละเอียด\": รายละเอียด,\n    \"ข้อความจาก AI\": ข้อความAI,\n    \"สถานะ\": \"รอซ่อม\"\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        0
+      ],
+      "id": "3d4c789e-c5ba-472e-bb22-8ee6f94cd612",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fromEmail": "67010516010@msu.ac.th",
+        "toEmail": "={{ $(\"On form submission\").item.json[\"อีเมล\"] }}",
+        "html": "=\n<h2>แจ้งยืนยันการรับเรื่องซ่อมอุปกรณ์</h2>\n\n<p>เรียน คุณ{{$json[\"ชื่อผู้แจ้ง\"] || \"ผู้แจ้งซ่อม\"}}</p>\n\n<p>ระบบได้รับข้อมูลแจ้งอุปกรณ์ชำรุดของท่านเรียบร้อยแล้ว โดยมีรายละเอียดดังนี้</p>\n\n<h3>รายละเอียดการแจ้งซ่อม</h3>\n\n<table style=\"border-collapse: collapse; width: 100%;\" border=\"1\" cellpadding=\"8\">\n  <tr>\n    <td><b>ชื่อผู้แจ้ง</b></td>\n    <td>{{$json[\"ชื่อผู้แจ้ง\"] || \"-\"}}</td>\n  </tr>\n  <tr>\n    <td><b>อีเมล</b></td>\n    <td>{{$json[\"อีเมล\"] || \"-\"}}</td>\n  </tr>\n  <tr>\n    <td><b>ประเภทอุปกรณ์</b></td>\n    <td>{{$json[\"อุปกรณ์\"] || \"-\"}}</td>\n  </tr>\n  <tr>\n    <td><b>หมายเลขเครื่อง</b></td>\n    <td>{{$json[\"หมายเลขเครื่อง\"] || \"-\"}}</td>\n  </tr>\n  <tr>\n    <td><b>สถานที่</b></td>\n    <td>{{$json[\"สถานที่\"] || \"-\"}}</td>\n  </tr>\n  <tr>\n    <td><b>อาการเสีย</b></td>\n    <td>{{$json[\"อาการเสีย\"] || \"-\"}}</td>\n  </tr>\n  <tr>\n    <td><b>ระดับความเร่งด่วน</b></td>\n    <td>{{$json[\"ความเร่งด่วน\"] || \"ยังไม่ได้ระบุ\"}}</td>\n  </tr>\n  <tr>\n    <td><b>ผลการวิเคราะห์แนวทางแก้ไขเบื้องต้น</b></td>\n    <td style=\"white-space: pre-wrap;\">{{$json[\"รายละเอียด\"] || \"AI ยังไม่สามารถวิเคราะห์รายละเอียดได้ กรุณาให้เจ้าหน้าที่ตรวจสอบเพิ่มเติม\"}}</td>\n  </tr>\n  <tr>\n    <td><b>สถานะการดำเนินงาน</b></td>\n    <td>{{$json[\"สถานะ\"] || \"รอซ่อม\"}}</td>\n  </tr>\n</table>\n\n<p>ขณะนี้ระบบได้รับเรื่องแล้ว และจะส่งข้อมูลให้ผู้รับผิดชอบตรวจสอบและดำเนินการต่อไป</p>\n\n<p>ขอบคุณที่แจ้งข้อมูลให้โรงเรียนทราบ</p>\n\n<p><b>ระบบแจ้งอุปกรณ์การเรียนที่เสียหรือไม่พร้อมใช้งาน</b></p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        -80
+      ],
+      "id": "778a3768-3d08-49fc-a4c1-e26ffc317b3e",
+      "name": "Send an Email",
+      "webhookId": "ec57bc11-9549-4bf7-b487-a5be101ddc81",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3dce85e6-8f3a-4583-b2d7-a4a52d7cad0f",
+              "leftValue": "={{ $json['หมายเลขเครื่อง'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "580f1cb3-3e14-48c4-909b-7a3e5284cb37",
+              "leftValue": "={{ $json['สถานะ'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "006e82fc-ca92-42c6-bf54-b5e82644deb4",
+              "leftValue": "={{ $json['รายละเอียด'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "97f1c33a-b65b-4cdd-96cc-9c08d0517cb7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "triggerAtHour": 15,
+              "triggerAtMinute": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -208,
+        400
+      ],
+      "id": "fa5d4758-28e6-4e7c-9117-add2ea6e4fb9",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้ - สำหรับระบบ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        16,
+        400
+      ],
+      "id": "cf1210a7-0b77-4579-8b04-ed1b25aeb570",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(item => item.json);\n\nfunction getField(row, keywords) {\n  for (const [key, value] of Object.entries(row)) {\n    const normalizedKey = key.trim().toLowerCase();\n\n    if (\n      keywords.some(keyword =>\n        normalizedKey === keyword.toLowerCase()\n      ) &&\n      value !== null &&\n      value !== undefined &&\n      String(value).trim() !== \"\"\n    ) {\n      return String(value).trim();\n    }\n  }\n\n  return \"\";\n}\n\nconst normalizedRows = rows.map(row => {\n  const detail = getField(row, [\n    \"รายละเอียด\",\n    \"แนวทางแก้ไขเบื้องต้น\"\n  ]);\n\n  const statusMatch = detail.match(\n    /สถานะ\\s*[:：]\\s*([^\\n,]+)/i\n  );\n\n  const equipment = getField(row, [\n    \"อุปกรณ์\",\n    \"ประเภทอุปกรณ์\",\n    \"ชื่ออุปกรณ์\"\n  ]);\n\n  const urgency = getField(row, [\n    \"ความเร่งด่วน\",\n    \"ระดับความเร่งด่วน\"\n  ]);\n\n  const status = getField(row, [\n    \"สถานะ\",\n    \"สถานะการซ่อม\",\n    \"สถานะงาน\"\n  ]) || statusMatch?.[1]?.trim() || \"\";\n\n  return {\n    \"สถานะ\": status || \"ไม่ระบุ\",\n    \"ประเภทอุปกรณ์\": equipment || \"ไม่ระบุ\",\n    \"ความเร่งด่วน\": urgency || \"ไม่ระบุ\"\n  };\n});\n\nfunction countBy(field) {\n  const counts = {};\n\n  for (const row of normalizedRows) {\n    const value = row[field];\n    counts[value] = (counts[value] || 0) + 1;\n  }\n\n  return Object.entries(counts)\n    .map(([name, count]) => `- ${name}: ${count} รายการ`)\n    .join(\"\\n\") || \"- ไม่มีข้อมูล\";\n}\n\nconst completed = [\"ซ่อมเสร็จแล้ว\", \"เสร็จสิ้น\", \"ปิดงาน\"];\nconst pendingStatuses = [\"รอซ่อม\", \"กำลังซ่อม\", \"รอดำเนินการ\"];\n\nconst done = normalizedRows.filter(row =>\n  completed.includes(row[\"สถานะ\"])\n).length;\n\nconst pending = normalizedRows.filter(row =>\n  pendingStatuses.includes(row[\"สถานะ\"])\n).length;\n\nconst unknown = normalizedRows.filter(row =>\n  row[\"สถานะ\"] === \"ไม่ระบุ\"\n).length;\n\nreturn [{\n  json: {\n    \"วันที่รายงาน\": new Date().toLocaleDateString(\"th-TH\", {\n      timeZone: \"Asia/Bangkok\",\n      day: \"2-digit\",\n      month: \"2-digit\",\n      year: \"numeric\"\n    }),\n    \"จำนวนรายการแจ้งซ่อมทั้งหมด\": rows.length,\n    \"จำนวนงานค้าง\": pending,\n    \"จำนวนงานซ่อมเสร็จแล้ว\": done,\n    \"จำนวนรายการที่ไม่ทราบสถานะ\": unknown,\n    \"สรุปตามสถานะ\": countBy(\"สถานะ\"),\n    \"สรุปตามประเภทอุปกรณ์\": countBy(\"ประเภทอุปกรณ์\"),\n    \"สรุปตามความเร่งด่วน\": countBy(\"ความเร่งด่วน\")\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        400
+      ],
+      "id": "aff55ddf-b73d-4a99-9286-6ee8d717cb86",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "fromEmail": "67010516010@msu.ac.th",
+        "toEmail": "67010516010@msu.ac.th",
+        "html": "=\n<h2>รายงานสรุปการแจ้งซ่อมอุปกรณ์การเรียน</h2>\n\n<p><b>วันที่รายงาน:</b> {{ $json[\"วันที่รายงาน\"] }}</p>\n\n<hr>\n\n<h3>1. ภาพรวมการแจ้งซ่อม</h3>\n<ul>\n  <li>จำนวนรายการแจ้งซ่อมทั้งหมด: <b>{{ $json[\"จำนวนรายการแจ้งซ่อมทั้งหมด\"] }}</b> รายการ</li>\n  <li>จำนวนงานค้าง: <b>{{ $json[\"จำนวนงานค้าง\"] }}</b> รายการ</li>\n  <li>จำนวนงานซ่อมเสร็จแล้ว: <b>{{ $json[\"จำนวนงานซ่อมเสร็จแล้ว\"] }}</b> รายการ</li>\n  <li>จำนวนรายการที่ไม่ทราบสถานะ: <b>{{ $json[\"จำนวนรายการที่ไม่ทราบสถานะ\"] }}</b> รายการ</li>\n</ul>\n\n<hr>\n\n<h3>2. สรุปตามสถานะ</h3>\n<ul>\n  {{ String($json[\"สรุปตามสถานะ\"] || \"- ไม่มีข้อมูล\").replace(/\\\\n/g, \"\\n\").split(\"\\n\").map(line => line.replace(/^- /, \"\").trim()).filter(Boolean).map(line => \"<li>\" + line + \"</li>\").join(\"\") }}\n</ul>\n\n<h3>3. สรุปตามประเภทอุปกรณ์</h3>\n<ul>\n  {{ String($json[\"สรุปตามประเภทอุปกรณ์\"] || \"- ไม่มีข้อมูล\").replace(/\\\\n/g, \"\\n\").split(\"\\n\").map(line => line.replace(/^- /, \"\").trim()).filter(Boolean).map(line => \"<li>\" + line + \"</li>\").join(\"\") }}\n</ul>\n\n<h3>4. สรุปตามระดับความเร่งด่วน</h3>\n<ul>\n  {{ String($json[\"สรุปตามความเร่งด่วน\"] || \"- ไม่มีข้อมูล\").replace(/\\\\n/g, \"\\n\").split(\"\\n\").map(line => line.replace(/^- /, \"\").trim()).filter(Boolean).map(line => \"<li>\" + line + \"</li>\").join(\"\") }}\n</ul>\n\n<hr>\n\n<h3>5. ข้อเสนอแนะ</h3>\n<p>ควรตรวจสอบรายการที่ยังรอซ่อม โดยพิจารณาจากระดับความเร่งด่วน และปรับปรุงสถานะเมื่อดำเนินการแล้ว</p>\n\n<p><i>รายงานนี้สร้างโดยระบบแจ้งซ่อมอุปกรณ์การเรียนอัตโนมัติ</i></p>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        736,
+        400
+      ],
+      "id": "d6fb062c-e59d-4215-8523-1ac28c648b41",
+      "name": "Send an Email1",
+      "webhookId": "8fe554a4-98c7-415c-b927-95d5a881b801",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "คุณคือ AI Agent สำหรับวิเคราะห์และสรุปรายงานการแจ้งซ่อมอุปกรณ์การเรียน\n\nหน้าที่ของคุณคือวิเคราะห์ข้อมูลการแจ้งซ่อมที่ได้รับจาก Google Sheets และสรุปผลตามข้อมูลจริงเท่านั้น ห้ามคาดเดาหรือสร้างตัวเลขขึ้นเอง\n\nให้สรุปข้อมูลดังนี้\n1. จำนวนรายการแจ้งซ่อมทั้งหมด โดยนับจำนวนรายการที่ได้รับ\n2. จำนวนงานที่ยังค้างอยู่ โดยนับรายการที่มีสถานะ \"รอซ่อม\" หรือยังดำเนินการไม่เสร็จ\n3. จำนวนงานที่ซ่อมเสร็จแล้ว\n4. สรุปผลภาพรวมให้เข้าใจง่าย\n\nข้อกำหนด:\n- ใช้ข้อมูลจากรายการที่ได้รับเท่านั้น\n- หากไม่มีข้อมูลสถานะของรายการใด ให้ระบุว่า \"ไม่สามารถระบุสถานะได้\" และไม่นับเป็นงานค้างโดยอัตโนมัติ\n- ห้ามนับรายการเดิมซ้ำ\n- แสดงผลเป็นภาษาไทยอย่างเป็นทางการ\n- หากข้อมูลไม่เพียงพอ ให้ระบุข้อจำกัดอย่างชัดเจน",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        400
+      ],
+      "id": "d84e626d-a45f-4c1f-a63b-3371cfe10b15",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-flash-lite-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        608
+      ],
+      "id": "3d8b6f46-a6d4-4672-b1ed-3985e0805bf0",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EWKNLOrtZiEB7Mmz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "67010516010@msu.ac.th",
+        "toEmail": "67010516010@msu.ac.th",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        96
+      ],
+      "id": "0d7eb870-bcd3-40bd-9edb-acf9de0e16cd",
+      "name": "Send an Email2",
+      "webhookId": "058789e5-6531-4035-84e9-3c47e3ddd786",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send an Email2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send an Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "170891fc-e24f-4f91-80b1-bd1f0e53955c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b41da7af670877a8dcbd613181fb81d2d70b672a0e668dfd95c22eeb9681b7fc"
+  },
+  "nodeGroups": [],
+  "id": "EiLpeSQtuXM9bLCD",
+  "tags": []
+}
