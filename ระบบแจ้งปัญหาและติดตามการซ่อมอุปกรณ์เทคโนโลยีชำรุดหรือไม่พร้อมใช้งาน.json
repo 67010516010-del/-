@@ -1,0 +1,2384 @@
+{
+  "name": "ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์เทคโนโลยีชำรุดหรือไม่พร้อมใช้งาน",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=คุณเป็นผู้ช่วยวิเคราะห์ปัญหาอุปกรณ์คอมพิวเตอร์และอุปกรณ์การเรียนของโรงเรียน\n\nหน้าที่ของคุณคือวิเคราะห์อาการเสียจากข้อมูลที่ผู้แจ้งให้มา ประเมินความเร่งด่วน เสนอแนวทางแก้ไขเบื้องต้นที่ปลอดภัย และพิจารณาว่าจำเป็นต้องส่งต่อผู้รับผิดชอบหรือไม่ โดยไม่สรุปสาเหตุเกินกว่าหลักฐานที่มี\n\n**ข้อมูลการแจ้งซ่อม**\n- ชื่อผู้แจ้ง: {{ $json['ชื่อผู้แจ้ง'] }}\n- ประเภทอุปกรณ์: {{ $json['ประเภทอุปกรณ์'] }}\n- หมายเลขอุปกรณ์: {{ $json['หมายเลขอุปกรณ์'] }}\n- ห้องเรียนหรือสถานที่: {{ $json['ห้องเรียน'] }}\n- อาการหรือปัญหาที่พบ: {{ $json['อาการ/ปัญหาที่พบ'] }}\n\n**เกณฑ์การประเมินความเร่งด่วน**\n- สูง: ปัญหากระทบการใช้งานของหลายคน ทำให้การเรียนการสอนหยุดชะงัก หรือมีความเสี่ยงด้านความปลอดภัย\n- ปานกลาง: อุปกรณ์ใช้งานไม่ได้ตามปกติ แต่ยังมีทางเลือกในการเรียนหรือใช้อุปกรณ์อื่น\n- ต่ำ: ปัญหาเล็กน้อยที่ไม่กระทบการใช้งานหลัก\n\nให้ประเมินจากข้อมูลที่ได้รับจริง หากข้อมูลไม่เพียงพอ ให้ประเมินอย่างระมัดระวังและไม่แต่งข้อมูลเพิ่มเติม\n\n**เกณฑ์การพิจารณาส่งต่อผู้รับผิดชอบ**\n1. กำหนด \"ต้องส่งต่อผู้รับผิดชอบ\" เป็น \"ใช่\" หากพบความเสี่ยงด้านความปลอดภัย เช่น กลิ่นไหม้ ความร้อนผิดปกติ สายไฟชำรุด หรือจำเป็นต้องเปิดเครื่อง ซ่อมวงจร หรือใช้ความเชี่ยวชาญของช่าง\n2. หากผู้แจ้งระบุชัดเจนว่าต้องส่งซ่อม ซ่อมเองไม่ได้ หรือทดลองแก้ไขเบื้องต้นแล้วไม่สำเร็จ ให้ตอบ \"ใช่\"\n3. หากอุปกรณ์มีอาการเสียที่ต้องตรวจสอบโดยช่าง และไม่สามารถแนะนำการตรวจสอบที่ปลอดภัยได้เพียงพอ ให้ตอบ \"ใช่\"\n4. กำหนดเป็น \"ไม่\" เฉพาะเมื่อมีแนวทางตรวจสอบเบื้องต้นที่ปลอดภัยและเหมาะสม โดยยังไม่มีข้อมูลบ่งชี้ว่าต้องส่งต่อทันที\n5. ห้ามกำหนดเป็น \"ไม่\" เพียงเพราะยังไม่ทราบสาเหตุ\n6. หากผู้แจ้งยังไม่ได้ทดลองแก้ไข ห้ามอ้างว่าแก้ไขสำเร็จหรือไม่สำเร็จ ให้ใช้ผลการดำเนินงาน \"รอดำเนินการ\"\n\n**เกณฑ์การกำหนดสถานะ**\n- \"รอแก้ไขเบื้องต้น\": สามารถแนะนำวิธีตรวจสอบที่ปลอดภัย และยังไม่มีเหตุให้ต้องส่งต่อทันที\n- \"รอซ่อม\": จำเป็นต้องส่งต่อผู้รับผิดชอบ หรือมีความเสี่ยงที่ไม่ควรให้ผู้ใช้แก้ไขเอง\n\nสถานะนี้แสดงขั้นตอนที่ควรดำเนินการต่อ ไม่ได้หมายความว่าผู้แจ้งได้ทดลองแก้ไขแล้ว\n\n**ข้อกำหนดด้านความปลอดภัย**\n- แนะนำเฉพาะวิธีตรวจสอบที่ปลอดภัย เช่น ตรวจสายเชื่อมต่อภายนอก ตรวจการตั้งค่า หรือทดลองใช้อุปกรณ์ต่อพ่วงอื่นที่ใช้งานได้\n- ห้ามแนะนำให้เปิดตัวเครื่อง ซ่อมวงจรไฟฟ้า หรือสัมผัสชิ้นส่วนที่ชำรุดซึ่งอาจก่อให้เกิดอันตราย\n- หากพบความเสี่ยง ให้หยุดใช้งานและส่งต่อผู้รับผิดชอบทันที\n- ห้ามแต่งข้อมูลหรือยืนยันสาเหตุโดยไม่มีหลักฐาน\n\n**รูปแบบคำตอบ**\nตอบกลับเป็น JSON ที่ถูกต้องเท่านั้น โดยมีคีย์ครบทั้ง 6 รายการ และค่าทุกค่าต้องเป็นข้อความ ดังนี้\n\n{\n  \"ความเร่งด่วน\": \"สูง, ปานกลาง หรือ ต่ำ\",\n  \"สาเหตุ\": \"สาเหตุที่เป็นไปได้ หรือยังไม่สามารถยืนยันสาเหตุได้\",\n  \"แนวทางแก้ไขเบื้องต้น\": \"วิธีตรวจสอบหรือแก้ไขที่ปลอดภัย หากต้องส่งซ่อมให้ระบุว่าไม่ควรทดลองแก้ไขเอง\",\n  \"ผลการดำเนินงาน\": \"รอดำเนินการ\",\n  \"สถานะ\": \"รอแก้ไขเบื้องต้น หรือ รอซ่อม\",\n  \"ต้องส่งต่อผู้รับผิดชอบ\": \"ใช่ หรือ ไม่\"\n}\n\nห้ามใส่ Markdown code fence ห้ามเพิ่มคีย์อื่น และห้ามใส่ข้อความนอก JSON\n\n**ข้อสำคัญ:** การกำหนด \"ต้องส่งต่อผู้รับผิดชอบ\" เป็น \"ไม่\" หมายถึงยังสามารถเริ่มตรวจสอบหรือแก้ไขเบื้องต้นได้อย่างปลอดภัยเท่านั้น ไม่ได้หมายความว่าปัญหาได้รับการแก้ไขแล้ว",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        64,
+        -16
+      ],
+      "id": "f7ad3404-9cc7-448b-a6b0-9a7e9bd514b2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        160
+      ],
+      "id": "3a535cc4-b0a3-49ae-a684-dd2d105fc5d3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EWKNLOrtZiEB7Mmz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const form = $(\"รับแจ้งปัญหา\").first().json;\nconst ai = $input.first().json;\n\n// แปลงผลลัพธ์จาก AI เป็น Object\nfunction parseAI(value) {\n  if (value && typeof value === \"object\" && !Array.isArray(value)) {\n    return value;\n  }\n\n  if (typeof value !== \"string\" || !value.trim()) {\n    return {};\n  }\n\n  const text = value.trim()\n    .replace(/^```(?:json)?\\s*/i, \"\")\n    .replace(/\\s*```$/i, \"\")\n    .trim();\n\n  try {\n    return JSON.parse(text);\n  } catch (e) {\n    const start = text.indexOf(\"{\");\n    const end = text.lastIndexOf(\"}\");\n\n    if (start !== -1 && end > start) {\n      try {\n        return JSON.parse(text.slice(start, end + 1));\n      } catch (e2) {}\n    }\n\n    return { \"ข้อความจาก AI\": text };\n  }\n}\n\nlet raw = ai.output ?? ai.text ?? ai.response ?? ai;\nlet data = parseAI(raw);\n\nif (typeof data.output === \"string\") {\n  data = parseAI(data.output);\n} else if (data.output && typeof data.output === \"object\") {\n  data = data.output;\n}\n\n// เลือกค่าที่มีข้อมูล\nfunction pick(...values) {\n  for (const value of values) {\n    if (\n      value !== undefined &&\n      value !== null &&\n      String(value).trim() !== \"\"\n    ) {\n      return value;\n    }\n  }\n  return \"\";\n}\n\n// ข้อมูลจากฟอร์ม\nconst ชื่อผู้แจ้ง = pick(form[\"ชื่อผู้แจ้ง\"]);\nconst อีเมล = pick(form[\"อีเมล\"]);\n\nconst อุปกรณ์ = pick(\n  form[\"ประเภทอุปกรณ์\"],\n  form[\"อุปกรณ์\"],\n  data[\"อุปกรณ์\"]\n);\n\nconst หมายเลขเครื่อง = pick(\n  form[\"หมายเลขอุปกรณ์\"],\n  form[\"หมายเลขเครื่อง\"],\n  data[\"หมายเลขเครื่อง\"]\n);\n\nconst สถานที่ = pick(\n  form[\"ห้องเรียน\"],\n  form[\"สถานที่\"],\n  data[\"สถานที่\"]\n);\n\nconst อาการเสีย = pick(\n  form[\"อาการ/ปัญหาที่พบ\"],\n  form[\"อาการเสีย\"],\n  data[\"อาการเสีย\"]\n);\n\n// ผลวิเคราะห์จาก AI\nconst สาเหตุ = pick(\n  data[\"สาเหตุ\"],\n  data[\"สาเหตุที่คาดว่าเกิดขึ้น\"],\n  data[\"สาเหตุที่เป็นไปได้\"]\n);\n\nconst ความเร่งด่วน = pick(\n  data[\"ความเร่งด่วน\"],\n  data[\"ระดับความเร่งด่วน\"],\n  data[\"urgency\"],\n  data[\"priority\"],\n  ai[\"ความเร่งด่วน\"],\n  ai[\"ระดับความเร่งด่วน\"]\n);\n\nconst รายละเอียด = pick(\n  data[\"แนวทางแก้ไขเบื้องต้น\"],\n  data[\"รายละเอียด\"],\n  data[\"แนวทางแก้ไข\"],\n  data[\"วิธีแก้ไข\"],\n  data[\"ข้อเสนอแนะ\"],\n  data[\"คำแนะนำ\"],\n  data[\"รายละเอียดการแก้ไข\"]\n);\n\n// ตรวจสอบค่าการส่งต่อ\nconst ค่าส่งต่อ = String(\n  pick(data[\"ต้องส่งต่อผู้รับผิดชอบ\"], \"\")\n).trim();\n\nlet ต้องส่งต่อ;\n\nif (ค่าส่งต่อ === \"ใช่\" || ค่าส่งต่อ.toLowerCase() === \"yes\") {\n  ต้องส่งต่อ = \"ใช่\";\n} else if (\n  ค่าส่งต่อ === \"ไม่\" ||\n  ค่าส่งต่อ.toLowerCase() === \"no\"\n) {\n  ต้องส่งต่อ = \"ไม่\";\n} else {\n  ต้องส่งต่อ = \"รอตรวจสอบ\";\n}\n\n// กำหนดสถานะให้สอดคล้องกับผลการส่งต่อ\nlet สถานะ;\n\nif (ต้องส่งต่อ === \"ใช่\") {\n  สถานะ = \"รอซ่อม\";\n} else if (ต้องส่งต่อ === \"ไม่\") {\n  สถานะ = \"รอแก้ไขเบื้องต้น\";\n} else {\n  สถานะ = \"รอตรวจสอบ\";\n}\n\n// ยังไม่ถือว่าดำเนินการสำเร็จจนกว่าจะมีผลจริง\nconst ผลการดำเนินงาน = \"รอดำเนินการ\";\n\nconst ข้อความAI = pick(\n  data[\"ข้อความจาก AI\"],\n  typeof raw === \"string\" ? raw : JSON.stringify(data)\n);\n\n// ตรวจสอบข้อมูลที่จำเป็น\nconst ข้อมูลที่ขาด = [];\n\nif (!ชื่อผู้แจ้ง) ข้อมูลที่ขาด.push(\"ชื่อผู้แจ้ง\");\nif (!อีเมล) ข้อมูลที่ขาด.push(\"อีเมล\");\nif (!อุปกรณ์) ข้อมูลที่ขาด.push(\"อุปกรณ์\");\nif (!อาการเสีย) ข้อมูลที่ขาด.push(\"อาการเสีย\");\n\nif (!ความเร่งด่วน) {\n  ข้อมูลที่ขาด.push(\"ความเร่งด่วน\");\n}\n\nif (!รายละเอียด) {\n  ข้อมูลที่ขาด.push(\"แนวทางแก้ไขเบื้องต้น\");\n}\n\nif (ต้องส่งต่อ === \"รอตรวจสอบ\") {\n  ข้อมูลที่ขาด.push(\"ผลการพิจารณาการส่งต่อผู้รับผิดชอบ\");\n}\n\nconst ผ่านการตรวจสอบ = ข้อมูลที่ขาด.length === 0;\n\n// ส่งข้อมูลไปยัง Node ถัดไป\nreturn [{\n  json: {\n    \"ชื่อผู้แจ้ง\": ชื่อผู้แจ้ง,\n    \"อีเมล\": อีเมล,\n    \"อุปกรณ์\": อุปกรณ์,\n    \"หมายเลขเครื่อง\": หมายเลขเครื่อง,\n    \"สถานที่\": สถานที่,\n    \"อาการเสีย\": อาการเสีย,\n    \"สาเหตุ\": สาเหตุ,\n    \"ความเร่งด่วน\": ความเร่งด่วน,\n    \"รายละเอียด\": รายละเอียด,\n    \"สถานะ\": สถานะ,\n    \"ผลการดำเนินงาน\": ผลการดำเนินงาน,\n    \"ต้องส่งต่อผู้รับผิดชอบ\": ต้องส่งต่อ,\n    \"ข้อความจาก AI\": ข้อความAI,\n    \"ข้อมูลครบถ้วน\": ผ่านการตรวจสอบ,\n    \"ข้อมูลที่ขาด\": ข้อมูลที่ขาด.join(\", \")\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "3d4c789e-c5ba-472e-bb22-8ee6f94cd612",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3dce85e6-8f3a-4583-b2d7-a4a52d7cad0f",
+              "leftValue": "={{ $json['ข้อมูลครบถ้วน'] }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "97f1c33a-b65b-4cdd-96cc-9c08d0517cb7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้ - สำหรับระบบ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1120,
+        1312
+      ],
+      "id": "cf1210a7-0b77-4579-8b04-ed1b25aeb570",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst items = $input.all();\n\n// แปลงค่าจาก Google Sheets ให้เป็นข้อความอย่างปลอดภัย\nfunction getText(row, key) {\n  const value = row[key];\n  if (value === null || value === undefined || value === '') {\n    return '-';\n  }\n  return String(value).trim();\n}\n\n// ป้องกันอักขระในข้อมูลทำให้ HTML ของอีเมลผิดรูปแบบ\nfunction escapeHtml(value) {\n  return String(value)\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;')\n    .replace(/'/g, '&#39;');\n}\n\n// ทำให้ค่าที่ใช้จัดกลุ่มมีรูปแบบสม่ำเสมอ\nfunction normalize(value) {\n  return String(value ?? '')\n    .trim()\n    .replace(/\\s+/g, ' ')\n    .toLowerCase();\n}\n\n// ปรับชื่อสถานะที่อาจเขียนต่างกันให้เป็นกลุ่มเดียวกัน\nfunction normalizeStatus(value) {\n  const v = normalize(value);\n\n  if (!v || v === '-') return 'ไม่ระบุสถานะ';\n  if (v.includes('เสร็จ') || v.includes('ใช้งานได้ตามปกติ')) {\n    return 'ซ่อมเสร็จแล้ว';\n  }\n  if (v.includes('กำลังซ่อม') || v.includes('กำลังดำเนินการ')) {\n    return 'กำลังดำเนินการ';\n  }\n  if (v.includes('รอซ่อม')) return 'รอซ่อม';\n  if (v.includes('รอตรวจสอบ')) return 'รอตรวจสอบ';\n  if (v.includes('รอรับเรื่อง')) return 'รอรับเรื่อง';\n  if (v.includes('ซ่อมไม่ได้') || v.includes('ไม่สามารถซ่อม')) {\n    return 'ไม่สามารถซ่อมได้';\n  }\n\n  // คงสถานะต้นฉบับไว้ หากไม่ตรงกับกลุ่มข้างต้น\n  return String(value).trim();\n}\n\nfunction normalizeUrgency(value) {\n  const v = normalize(value);\n\n  if (!v || v === '-') return 'ไม่ระบุ';\n  if (v.includes('สูง')) return 'สูง';\n  if (v.includes('ปานกลาง')) return 'ปานกลาง';\n  if (v.includes('ต่ำ')) return 'ต่ำ';\n\n  return String(value).trim();\n}\n\nconst rows = items.map(item => item.json);\n\n// นับรายการทั้งหมดที่ได้รับจาก Google Sheets\nconst total = rows.length;\n\n// นับจำนวนตามสถานะ\nconst statusCounts = {};\nfor (const row of rows) {\n  const status = normalizeStatus(row['สถานะ']);\n  statusCounts[status] = (statusCounts[status] || 0) + 1;\n}\n\n// นับจำนวนตามระดับความเร่งด่วน\nconst urgencyCounts = {};\nfor (const row of rows) {\n  const urgency = normalizeUrgency(row['ความเร่งด่วน']);\n  urgencyCounts[urgency] = (urgencyCounts[urgency] || 0) + 1;\n}\n\n// สร้างแถวตารางรายละเอียดรายการแจ้งซ่อม\nconst detailRows = rows.map((row, index) => {\n  const device = getText(row, 'อุปกรณ์');\n  const number = getText(row, 'หมายเลขเครื่อง');\n  const location = getText(row, 'สถานที่');\n  const issue = getText(row, 'อาการเสีย');\n  const urgency = normalizeUrgency(row['ความเร่งด่วน']);\n  const status = normalizeStatus(row['สถานะ']);\n  const reporter = getText(row, 'ชื่อผู้แจ้ง');\n  const result = getText(row, 'ผลการดำเนินงาน');\n\n  return `\n    <tr>\n      <td>${index + 1}</td>\n      <td>${escapeHtml(device)}</td>\n      <td>${escapeHtml(number)}</td>\n      <td>${escapeHtml(location)}</td>\n      <td>${escapeHtml(issue)}</td>\n      <td>${escapeHtml(urgency)}</td>\n      <td>${escapeHtml(status)}</td>\n      <td>${escapeHtml(reporter)}</td>\n      <td>${escapeHtml(result)}</td>\n    </tr>`;\n}).join('');\n\n// สร้างตารางสรุป โดยเรียงตามชื่อกลุ่ม\nfunction makeSummaryTable(data, heading) {\n  const entries = Object.entries(data)\n    .sort((a, b) => a[0].localeCompare(b[0], 'th'));\n\n  const body = entries.length\n    ? entries.map(([name, count]) => `\n        <tr>\n          <td>${escapeHtml(name)}</td>\n          <td style=\"text-align:center\">${count}</td>\n        </tr>`).join('')\n    : '<tr><td colspan=\"2\">ไม่มีข้อมูล</td></tr>';\n\n  return `\n    <h3>${heading}</h3>\n    <table>\n      <thead><tr><th>รายการ</th><th>จำนวน</th></tr></thead>\n      <tbody>${body}</tbody>\n    </table>`;\n}\n\nconst bangkokDate = new Intl.DateTimeFormat('th-TH', {\n  dateStyle: 'long',\n  timeZone: 'Asia/Bangkok'\n}).format(new Date());\n\nconst html = `\n<!DOCTYPE html>\n<html lang=\"th\">\n<head>\n<meta charset=\"UTF-8\">\n<style>\n  body { font-family: Arial, Tahoma, sans-serif; color: #222; line-height: 1.5; }\n  h2 { color: #174a7e; }\n  h3 { color: #174a7e; margin-top: 24px; }\n  table { border-collapse: collapse; width: 100%; margin: 12px 0 20px; }\n  th, td { border: 1px solid #d6dce5; padding: 8px; text-align: left; vertical-align: top; }\n  th { background: #edf3f8; }\n  .total { background: #f2f6fa; padding: 14px; border-radius: 6px; }\n  .note { color: #666; font-size: 12px; }\n</style>\n</head>\n<body>\n  <h2>รายงานสรุปการแจ้งปัญหาและติดตามการซ่อมอุปกรณ์</h2>\n  <p>วันที่จัดทำรายงาน: ${escapeHtml(bangkokDate)}</p>\n  <p class=\"note\">\n    รายงานนี้สรุปข้อมูลทั้งหมดที่มีอยู่ใน Google Sheets ณ เวลาที่สร้างรายงาน\n  </p>\n\n  <div class=\"total\">\n    <strong>จำนวนรายการแจ้งซ่อมทั้งหมด: ${total} รายการ</strong>\n  </div>\n\n  ${makeSummaryTable(statusCounts, 'สรุปจำนวนรายการตามสถานะ')}\n  ${makeSummaryTable(urgencyCounts, 'สรุปจำนวนรายการตามความเร่งด่วน')}\n\n  <h3>รายละเอียดรายการแจ้งซ่อม</h3>\n  <table>\n    <thead>\n      <tr>\n        <th>ลำดับ</th>\n        <th>อุปกรณ์</th>\n        <th>หมายเลขเครื่อง</th>\n        <th>สถานที่</th>\n        <th>อาการเสีย</th>\n        <th>ความเร่งด่วน</th>\n        <th>สถานะ</th>\n        <th>ผู้แจ้ง</th>\n        <th>ผลการดำเนินงาน</th>\n      </tr>\n    </thead>\n    <tbody>\n      ${detailRows || '<tr><td colspan=\"9\">ยังไม่มีรายการแจ้งซ่อม</td></tr>'}\n    </tbody>\n  </table>\n\n  <p>รายงานนี้สร้างและส่งโดยระบบอัตโนมัติผ่าน n8n</p>\n</body>\n</html>`;\n\nreturn [{\n  json: {\n    subject: `รายงานสรุปการแจ้งซ่อมประจำสัปดาห์ - ${bangkokDate}`,\n    total,\n    statusCounts,\n    urgencyCounts,\n    html\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -896,
+        1312
+      ],
+      "id": "aff55ddf-b73d-4a99-9286-6ee8d717cb86",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "fromEmail": "cmuxngkhotr@gmail.com",
+        "toEmail": "cmuxngkhotr@gmail.com",
+        "subject": "แจ้งซ่อมอุปกรณ์การเรียนรายการใหม่",
+        "html": "=\n<div style=\"font-family: Arial, Tahoma, sans-serif; color: #333; line-height: 1.7; max-width: 650px; margin: 0 auto; padding: 20px;\">\n\n  <h2 style=\"color: #2563eb; margin-bottom: 8px;\">\n    แจ้งซ่อมอุปกรณ์การเรียนรายการใหม่\n  </h2>\n\n  <p>เรียน ผู้ดูแลระบบ</p>\n\n  <p>\n    มีรายการแจ้งซ่อมอุปกรณ์การเรียนใหม่เข้าสู่ระบบ\n    กรุณาตรวจสอบรายละเอียดและดำเนินการตามความเหมาะสม\n  </p>\n\n  <div style=\"background-color: #f3f6fb; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #1d4ed8;\">ข้อมูลผู้แจ้ง</h3>\n\n    <p><strong>ชื่อผู้แจ้ง:</strong> {{ $json[\"ชื่อผู้แจ้ง\"] }}</p>\n    <p><strong>อีเมลผู้แจ้ง:</strong> {{ $json[\"อีเมล\"] }}</p>\n    <p><strong>สถานที่:</strong> {{ $json[\"สถานที่\"] }}</p>\n  </div>\n\n  <div style=\"border: 1px solid #dbeafe; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #1d4ed8;\">รายละเอียดการแจ้งซ่อม</h3>\n\n    <p><strong>อุปกรณ์:</strong> {{ $json[\"อุปกรณ์\"] }}</p>\n    <p><strong>หมายเลขเครื่อง:</strong> {{ $json[\"หมายเลขเครื่อง\"] }}</p>\n    <p><strong>อาการเสีย:</strong> {{ $json[\"อาการเสีย\"] }}</p>\n    <p><strong>สาเหตุเบื้องต้น:</strong> {{ $json[\"สาเหตุ\"] || \"ยังไม่สามารถระบุได้\" }}</p>\n\n    <p>\n      <strong>ความเร่งด่วน:</strong>\n      <span style=\"font-weight: bold; color: #b91c1c;\">\n        {{ $json[\"ความเร่งด่วน\"] || \"ยังไม่ระบุ\" }}\n      </span>\n    </p>\n\n    <p><strong>แนวทางแก้ไขเบื้องต้น:</strong></p>\n    <div style=\"background-color: #f9fafb; padding: 12px; border-radius: 6px; white-space: pre-wrap;\">\n      {{ $json[\"รายละเอียด\"] || \"ไม่มีข้อมูลแนวทางแก้ไขเบื้องต้น\" }}\n    </div>\n\n    <p>\n      <strong>สถานะ:</strong>\n      <span style=\"font-weight: bold; color: #b45309;\">\n        {{ $json[\"สถานะ\"] || \"รอดำเนินการ\" }}\n      </span>\n    </p>\n  </div>\n\n  <div style=\"background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 16px; margin: 18px 0; border-radius: 4px;\">\n    <strong style=\"color: #1d4ed8;\">ขั้นตอนต่อไป</strong>\n    <p style=\"margin-bottom: 0;\">\n      กรุณาตรวจสอบข้อมูล ประเมินปัญหา และดำเนินการแก้ไขตามระดับความเร่งด่วนที่ระบบกำหนด\n    </p>\n  </div>\n\n  <p>ขอขอบคุณ</p>\n\n  <p style=\"margin-top: 24px;\">\n    <strong>ระบบแจ้งซ่อมอุปกรณ์การเรียนอัตโนมัติ</strong>\n  </p>\n\n  <hr style=\"border: 0; border-top: 1px solid #ddd; margin-top: 24px;\">\n\n  <p style=\"font-size: 12px; color: #777;\">\n    อีเมลฉบับนี้ส่งโดยระบบแจ้งซ่อมอุปกรณ์การเรียนอัตโนมัติ\n  </p>\n\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1152,
+        -256
+      ],
+      "id": "43ff7522-8e3c-4ed9-8934-e3d2e761c56b",
+      "name": "Email แอดมิน",
+      "webhookId": "3614c0d4-75a7-4c37-a81e-d8a03622a276",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "cmuxngkhotr@gmail.com",
+        "toEmail": "={{ $('If').item.json['อีเมล'] }}",
+        "subject": "แจ้งผลการตรวจสอบข้อมูลแจ้งซ่อมอุปกรณ์เทคโนโลยี",
+        "html": "=\n<div style=\"font-family: Arial, Tahoma, sans-serif; color: #333; line-height: 1.7; max-width: 650px; margin: 0 auto; padding: 20px;\">\n\n  <h2 style=\"color: #2563eb; margin-bottom: 8px;\">\n    ยืนยันการรับแจ้งซ่อมอุปกรณ์เทคโนโลยี\n  </h2>\n\n  <p>เรียน คุณ{{ $('If').item.json['ชื่อผู้แจ้ง'] }}</p>\n\n  <p>\n    ระบบได้รับข้อมูลแจ้งซ่อมของคุณเรียบร้อยแล้ว\n    โดยมีรายละเอียดดังต่อไปนี้\n  </p>\n\n  <div style=\"background-color: #f3f6fb; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #1d4ed8;\">รายละเอียดการแจ้งซ่อม</h3>\n\n    <p><strong>อุปกรณ์:</strong> {{ $('If').item.json['อุปกรณ์'] }}</p>\n    <p><strong>หมายเลขเครื่อง:</strong> {{ $('If').item.json['หมายเลขเครื่อง'] }}</p>\n    <p><strong>สถานที่:</strong> {{ $('If').item.json['สถานที่'] }}</p>\n    <p><strong>อาการเสีย:</strong> {{ $('If').item.json['อาการเสีย'] }}</p>\n\n    <p>\n      <strong>ความเร่งด่วน:</strong>\n      <span style=\"font-weight: bold; color: #b91c1c;\">\n        {{ $('If').item.json['ความเร่งด่วน'] || 'ยังไม่ระบุ' }}\n      </span>\n    </p>\n\n    <p>\n      <strong>สาเหตุเบื้องต้น:</strong>\n      {{ $json[\"สาเหตุ\"] || \"อยู่ระหว่างตรวจสอบ\" }}\n    </p>\n  </div>\n\n  <div style=\"border: 1px solid #dbeafe; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #1d4ed8;\">คำแนะนำเบื้องต้น</h3>\n\n    <div style=\"background-color: #f9fafb; padding: 12px; border-radius: 6px; white-space: pre-wrap;\">\n      {{ $('If').item.json['รายละเอียด'] || 'อยู่ระหว่างตรวจสอบคำแนะนำ' }}\n    </div>\n\n    <p style=\"margin-bottom: 0;\">\n      <strong>สถานะ:</strong>\n      <span style=\"font-weight: bold; color: #b45309;\">\n        {{ $('If').item.json['สถานะ'] || 'รอดำเนินการซ่อม' }}\n      </span>\n    </p>\n  </div>\n\n  <div style=\"background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 16px; margin: 18px 0; border-radius: 4px;\">\n    <strong style=\"color: #1d4ed8;\">ขั้นตอนต่อไป</strong>\n    <p style=\"margin-bottom: 0;\">\n      ขณะนี้ระบบได้รับรายการแจ้งซ่อมของคุณแล้ว\n      เจ้าหน้าที่จะตรวจสอบและดำเนินการตามขั้นตอนต่อไป\n    </p>\n  </div>\n\n  <p>ขอบคุณที่ใช้บริการระบบแจ้งซ่อมอุปกรณ์การเรียน</p>\n\n  <p style=\"margin-top: 24px;\">\n    ขอแสดงความนับถือ<br>\n    <strong>ระบบแจ้งซ่อมอุปกรณ์การเรียนอัตโนมัติ</strong>\n  </p>\n\n  <hr style=\"border: 0; border-top: 1px solid #ddd; margin-top: 24px;\">\n\n  <p style=\"font-size: 12px; color: #777;\">\n    อีเมลนี้ส่งโดยระบบอัตโนมัติ กรุณาเก็บไว้เป็นหลักฐานการแจ้งซ่อม\n  </p>\n\n</div>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1360,
+        -256
+      ],
+      "id": "a023f271-2fe3-43f6-a880-3b1bffc53c51",
+      "name": "Email ยืนยันผู้แจ้งซ่อม",
+      "webhookId": "7cf8b0bd-f406-43c0-be98-06656343d16d",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['ต้องส่งต่อผู้รับผิดชอบ'] }}",
+                    "rightValue": "ใช่",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2e86c0cc-f0f2-466f-b10f-5e77eb49fd86"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ต้องส่งซ่อม"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "80e8e09c-0cad-4a8c-8a25-34eaef9a8f2b",
+                    "leftValue": "={{ $json['ต้องส่งต่อผู้รับผิดชอบ'] }}",
+                    "rightValue": "ไม่",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "แก้ไขเบื้องต้น"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        -160
+      ],
+      "id": "54fbf62d-4b19-4fe2-bff0-e43044af65c2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "fromEmail": "cmuxngkhotr@gmail.com",
+        "toEmail": "cmuxngkhotr@gmail.com",
+        "subject": "แจ้งซ่อมอุปกรณ์การเรียนรายการใหม่",
+        "html": "=\n<div style=\"font-family: Arial, Tahoma, sans-serif; color: #333; line-height: 1.7; max-width: 650px; margin: 0 auto; padding: 20px;\">\n\n  <h2 style=\"color: #2563eb; margin-bottom: 8px;\">\n    แจ้งซ่อมอุปกรณ์การเรียนรายการใหม่\n  </h2>\n\n  <p>เรียน ผู้ดูแลระบบ</p>\n\n  <p>\n    มีรายการแจ้งซ่อมอุปกรณ์การเรียนใหม่เข้าสู่ระบบ\n    กรุณาตรวจสอบรายละเอียดและดำเนินการตามความเหมาะสม\n  </p>\n\n  <div style=\"background-color: #f3f6fb; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #1d4ed8;\">ข้อมูลผู้แจ้ง</h3>\n\n    <p><strong>ชื่อผู้แจ้ง:</strong> {{ $json[\"ชื่อผู้แจ้ง\"] }}</p>\n    <p><strong>อีเมลผู้แจ้ง:</strong> {{ $json[\"อีเมล\"] }}</p>\n    <p><strong>สถานที่:</strong> {{ $json[\"สถานที่\"] }}</p>\n  </div>\n\n  <div style=\"border: 1px solid #dbeafe; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #1d4ed8;\">รายละเอียดการแจ้งซ่อม</h3>\n\n    <p><strong>อุปกรณ์:</strong> {{ $json[\"อุปกรณ์\"] }}</p>\n    <p><strong>หมายเลขเครื่อง:</strong> {{ $json[\"หมายเลขเครื่อง\"] }}</p>\n    <p><strong>อาการเสีย:</strong> {{ $json[\"อาการเสีย\"] }}</p>\n    <p><strong>สาเหตุเบื้องต้น:</strong> {{ $json[\"สาเหตุ\"] || \"ยังไม่สามารถระบุได้\" }}</p>\n\n    <p>\n      <strong>ความเร่งด่วน:</strong>\n      <span style=\"font-weight: bold; color: #b91c1c;\">\n        {{ $json[\"ความเร่งด่วน\"] || \"ยังไม่ระบุ\" }}\n      </span>\n    </p>\n\n    <p><strong>แนวทางแก้ไขเบื้องต้น:</strong></p>\n    <div style=\"background-color: #f9fafb; padding: 12px; border-radius: 6px; white-space: pre-wrap;\">\n      {{ $json[\"รายละเอียด\"] || \"ไม่มีข้อมูลแนวทางแก้ไขเบื้องต้น\" }}\n    </div>\n\n    <p>\n      <strong>สถานะ:</strong>\n      <span style=\"font-weight: bold; color: #b45309;\">\n        {{ $json[\"สถานะ\"] || \"รอดำเนินการ\" }}\n      </span>\n    </p>\n  </div>\n\n  <div style=\"background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 16px; margin: 18px 0; border-radius: 4px;\">\n    <strong style=\"color: #1d4ed8;\">ขั้นตอนต่อไป</strong>\n    <p style=\"margin-bottom: 0;\">\n      กรุณาตรวจสอบข้อมูล ประเมินปัญหา และดำเนินการแก้ไขตามระดับความเร่งด่วนที่กำหนด\n    </p>\n  </div>\n\n  <p>ขอขอบคุณ</p>\n\n  <p style=\"margin-top: 24px;\">\n    <strong>ระบบแจ้งซ่อมอุปกรณ์การเรียนอัตโนมัติ</strong>\n  </p>\n\n  <hr style=\"border: 0; border-top: 1px solid #ddd; margin-top: 24px;\">\n\n  <p style=\"font-size: 12px; color: #777;\">\n    อีเมลฉบับนี้ส่งโดยระบบแจ้งซ่อมอุปกรณ์การเรียนอัตโนมัติ\n  </p>\n\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1152,
+        -64
+      ],
+      "id": "680515ba-5b15-402a-a915-dacacc831c7d",
+      "name": "Email แอดมิน1",
+      "webhookId": "3614c0d4-75a7-4c37-a81e-d8a03622a276",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "cmuxngkhotr@gmail.com",
+        "toEmail": "={{ $('If').item.json['อีเมล'] }}",
+        "subject": "แจ้งผลการตรวจสอบข้อมูลแจ้งซ่อมอุปกรณ์เทคโนโลยี",
+        "html": "=\n<div style=\"font-family: Arial, Tahoma, sans-serif; color: #333; line-height: 1.7; max-width: 650px; margin: 0 auto; padding: 20px;\">\n\n  <h2 style=\"color: #2563eb; margin-bottom: 8px;\">\n    ยืนยันการรับแจ้งซ่อมอุปกรณ์เทคโนโลยี\n  </h2>\n\n  <p>เรียน คุณ{{ $('If').item.json['ชื่อผู้แจ้ง'] }}</p>\n\n  <p>\n    ระบบได้รับข้อมูลแจ้งซ่อมของคุณเรียบร้อยแล้ว\n    โดยมีรายละเอียดดังต่อไปนี้\n  </p>\n\n  <div style=\"background-color: #f3f6fb; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #1d4ed8;\">รายละเอียดอุปกรณ์</h3>\n\n    <p><strong>อุปกรณ์:</strong> {{ $('If').item.json['อุปกรณ์'] }}</p>\n    <p><strong>หมายเลขเครื่อง:</strong> {{ $('If').item.json['หมายเลขเครื่อง'] }}</p>\n    <p><strong>สถานที่:</strong> {{ $('If').item.json['สถานที่'] }}</p>\n    <p><strong>อาการเสีย:</strong> {{ $('If').item.json['อาการเสีย'] }}</p>\n\n    <p>\n      <strong>ความเร่งด่วน:</strong>\n      <span style=\"font-weight: bold; color: #b91c1c;\">\n        {{ $('If').item.json['ความเร่งด่วน'] || 'ยังไม่ระบุ' }}\n      </span>\n    </p>\n\n    <p>\n      <strong>สาเหตุเบื้องต้น:</strong>\n      {{ $json[\"สาเหตุ\"] || \"อยู่ระหว่างตรวจสอบ\" }}\n    </p>\n  </div>\n\n  <div style=\"border: 1px solid #dbeafe; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #1d4ed8;\">คำแนะนำเบื้องต้น</h3>\n\n    <div style=\"background-color: #f9fafb; padding: 12px; border-radius: 6px; white-space: pre-wrap;\">\n      {{ $('If').item.json['รายละเอียด'] || 'อยู่ระหว่างตรวจสอบคำแนะนำ' }}\n    </div>\n\n    <p style=\"margin-bottom: 0;\">\n      <strong>สถานะ:</strong>\n      <span style=\"font-weight: bold; color: #b45309;\">\n        {{ $('If').item.json['สถานะ'] || 'รอดำเนินการซ่อม' }}\n      </span>\n    </p>\n  </div>\n\n  <div style=\"background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 16px; margin: 18px 0; border-radius: 4px;\">\n    <strong style=\"color: #1d4ed8;\">ขั้นตอนต่อไป</strong>\n    <p style=\"margin-bottom: 0;\">\n      ขณะนี้ระบบได้รับรายการแจ้งซ่อมของคุณแล้ว\n      เจ้าหน้าที่จะตรวจสอบข้อมูลและดำเนินการตามขั้นตอนต่อไป\n    </p>\n  </div>\n\n  <p>ขอบคุณที่ใช้บริการระบบแจ้งซ่อมอุปกรณ์การเรียน</p>\n\n  <p style=\"margin-top: 24px;\">\n    ขอแสดงความนับถือ<br>\n    <strong>ระบบแจ้งซ่อมอุปกรณ์การเรียนอัตโนมัติ</strong>\n  </p>\n\n  <hr style=\"border: 0; border-top: 1px solid #ddd; margin-top: 24px;\">\n\n  <p style=\"font-size: 12px; color: #777;\">\n    อีเมลนี้ส่งโดยระบบอัตโนมัติ กรุณาเก็บไว้เป็นหลักฐานการแจ้งซ่อม\n  </p>\n\n</div>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1360,
+        -64
+      ],
+      "id": "f697c666-24e3-40f4-9f78-304edb65e152",
+      "name": "Email ยืนยันผู้แจ้งซ่อม1",
+      "webhookId": "7cf8b0bd-f406-43c0-be98-06656343d16d",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้ - สำหรับระบบ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ชื่อผู้แจ้ง": "={{ $('Code in JavaScript').item.json['ชื่อผู้แจ้ง'] }}",
+            "อีเมล": "={{ $('Code in JavaScript').item.json['อีเมล'] }}",
+            "อุปกรณ์": "={{ $('Code in JavaScript').item.json['อุปกรณ์'] }}",
+            "หมายเลขเครื่อง": "={{ $('Code in JavaScript').item.json['หมายเลขเครื่อง'] }}",
+            "สถานที่": "={{ $('Code in JavaScript').item.json['สถานที่'] }}",
+            "อาการเสีย": "={{ $('Code in JavaScript').item.json['อาการเสีย'] }}",
+            "ความเร่งด่วน": "={{ $('Code in JavaScript').item.json['ความเร่งด่วน'] }}",
+            "รายละเอียด": "={{ $('Code in JavaScript').item.json['รายละเอียด'] }}",
+            "สถานะ": "={{ $('Code in JavaScript').item.json['สถานะ'] }}",
+            "ผลการดำเนินงาน": "={{ $('Code in JavaScript').item.json['ผลการดำเนินงาน'] }}",
+            "ส่งต่อผู้รับผิดชอบหรือไม่": "={{ $('Code in JavaScript').item.json['ต้องส่งต่อผู้รับผิดชอบ'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ชื่อผู้แจ้ง",
+              "displayName": "ชื่อผู้แจ้ง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "อีเมล",
+              "displayName": "อีเมล",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "อุปกรณ์",
+              "displayName": "อุปกรณ์",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "หมายเลขเครื่อง",
+              "displayName": "หมายเลขเครื่อง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "สถานที่",
+              "displayName": "สถานที่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "อาการเสีย",
+              "displayName": "อาการเสีย",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ความเร่งด่วน",
+              "displayName": "ความเร่งด่วน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "รายละเอียด",
+              "displayName": "รายละเอียด",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "สถานะ",
+              "displayName": "สถานะ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ผลการดำเนินงาน",
+              "displayName": "ผลการดำเนินงาน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "displayName": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1536,
+        -64
+      ],
+      "id": "a3a37797-6379-454f-b4ed-424454c3ae2c",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "แจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้",
+        "formDescription": "แบบฟอร์มสำหรับแจ้งอุปกรณ์ที่เสียหรือไม่พร้อมใช้งาน",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "ชื่อผู้แจ้ง"
+            },
+            {
+              "fieldLabel": "อีเมล"
+            },
+            {
+              "fieldLabel": "ห้องเรียน"
+            },
+            {
+              "fieldLabel": "ประเภทอุปกรณ์"
+            },
+            {
+              "fieldLabel": "หมายเลขอุปกรณ์"
+            },
+            {
+              "fieldLabel": "อาการ/ปัญหาที่พบ",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -1328,
+        16
+      ],
+      "id": "a1d8749c-d18d-484c-809a-19d9cf0dada1",
+      "name": "รับแจ้งปัญหา",
+      "webhookId": "28b63f1b-710d-4e34-8052-5ddd73e89529"
+    },
+    {
+      "parameters": {
+        "formTitle": "แบบรายงานผลการแก้ไขปัญหาอุปกรณ์คอมพิวเตอร์เบื้องต้น",
+        "formDescription": "กรุณากรอกข้อมูลหลังจากทดลองแก้ไขปัญหาตามคำแนะนำที่ได้รับทางอีเมล เพื่อให้ระบบบันทึกผลและดำเนินการในขั้นตอนต่อไป",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "ชื่อผู้แจ้ง"
+            },
+            {
+              "fieldLabel": "อีเมล"
+            },
+            {
+              "fieldLabel": "อุปกรณ์ที่แจ้งปัญหา"
+            },
+            {
+              "fieldLabel": "อาการเสีย"
+            },
+            {
+              "fieldLabel": "หมายเลขเครื่อง"
+            },
+            {
+              "fieldLabel": "ผลการแก้ไขเบื้องต้น",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "แก้ไขได้แล้ว ใช้งานได้ตามปกติ"
+                  },
+                  {
+                    "option": "ไม่สามารถแก้ไขตามคำแนะนำได้"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -1328,
+        528
+      ],
+      "id": "d2b0528b-28e0-44dd-8aeb-3389e9460de6",
+      "name": "รับผลการแก้ไข",
+      "webhookId": "dde79ec9-c26f-489d-b09c-7eda7e594e1f"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('รับผลการแก้ไข').first().json['ผลการแก้ไขเบื้องต้น'] }}",
+                    "rightValue": "=แก้ไขได้แล้ว ใช้งานได้ตามปกติ",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1eb7688c-ebc3-40b1-a65f-7fbcc598df34"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "แก้ไขได้"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "241acd2a-33d1-4fa8-838e-95eccf8688d9",
+                    "leftValue": "={{ $('รับผลการแก้ไข').first().json['ผลการแก้ไขเบื้องต้น'] }}",
+                    "rightValue": "ไม่สามารถแก้ไขตามคำแนะนำได้",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ไม่สามารถแก้ไขได้"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        528
+      ],
+      "id": "5a226ce1-fd22-4f65-ad00-7de913a9478a",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้ - สำหรับระบบ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "สถานะ": "แก้ไขได้แล้ว ",
+            "ผลการดำเนินงาน": "={{ $('รับผลการแก้ไข').first().json['ผลการแก้ไขเบื้องต้น'] }}",
+            "ส่งต่อผู้รับผิดชอบหรือไม่": "ไม่",
+            "ชื่อผู้แจ้ง": "={{ $json['ชื่อผู้แจ้ง'] }}"
+          },
+          "matchingColumns": [
+            "ชื่อผู้แจ้ง"
+          ],
+          "schema": [
+            {
+              "id": "ชื่อผู้แจ้ง",
+              "displayName": "ชื่อผู้แจ้ง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "อีเมล",
+              "displayName": "อีเมล",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "อุปกรณ์",
+              "displayName": "อุปกรณ์",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "หมายเลขเครื่อง",
+              "displayName": "หมายเลขเครื่อง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "สถานที่",
+              "displayName": "สถานที่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "อาการเสีย",
+              "displayName": "อาการเสีย",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ความเร่งด่วน",
+              "displayName": "ความเร่งด่วน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "รายละเอียด",
+              "displayName": "รายละเอียด",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "สถานะ",
+              "displayName": "สถานะ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ผลการดำเนินงาน",
+              "displayName": "ผลการดำเนินงาน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "displayName": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -624,
+        432
+      ],
+      "id": "a4200745-276b-49a5-b324-adb773ef385a",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้ - สำหรับระบบ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ชื่อผู้แจ้ง",
+              "lookupValue": "={{ $json['ชื่อผู้แจ้ง'] }}"
+            },
+            {
+              "lookupColumn": "หมายเลขเครื่อง",
+              "lookupValue": "={{ $json['หมายเลขเครื่อง'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1088,
+        528
+      ],
+      "id": "fc3e54c9-e190-43a4-b90a-dd6dae461928",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้ - สำหรับระบบ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "สถานะ": "ไม่สามารถแก้ไขได้",
+            "ผลการดำเนินงาน": "={{ $('รับผลการแก้ไข').first().json['ผลการแก้ไขเบื้องต้น'] }}",
+            "ส่งต่อผู้รับผิดชอบหรือไม่": "ใช่",
+            "ชื่อผู้แจ้ง": "={{ $json['ชื่อผู้แจ้ง'] }}"
+          },
+          "matchingColumns": [
+            "ชื่อผู้แจ้ง"
+          ],
+          "schema": [
+            {
+              "id": "ชื่อผู้แจ้ง",
+              "displayName": "ชื่อผู้แจ้ง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "อีเมล",
+              "displayName": "อีเมล",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "อุปกรณ์",
+              "displayName": "อุปกรณ์",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "หมายเลขเครื่อง",
+              "displayName": "หมายเลขเครื่อง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "สถานที่",
+              "displayName": "สถานที่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "อาการเสีย",
+              "displayName": "อาการเสีย",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ความเร่งด่วน",
+              "displayName": "ความเร่งด่วน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "รายละเอียด",
+              "displayName": "รายละเอียด",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "สถานะ",
+              "displayName": "สถานะ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ผลการดำเนินงาน",
+              "displayName": "ผลการดำเนินงาน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "displayName": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -624,
+        624
+      ],
+      "id": "a0184f6d-4cc3-4b88-9a16-4ea5a71059f6",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "cmuxngkhotr@gmail.com",
+        "toEmail": "={{ $('Get row(s) in sheet1').item.json['อีเมล'] }}",
+        "subject": "แจ้งผลการดำเนินการซ่อมอุปกรณ์",
+        "html": "=\n<div style=\"font-family: Arial, Tahoma, sans-serif; color: #333; line-height: 1.7; max-width: 650px; margin: 0 auto; padding: 20px;\">\n\n  <h2 style=\"color: #b45309; margin-bottom: 16px;\">\n    แจ้งผลการแก้ไขปัญหาอุปกรณ์\n  </h2>\n\n  <p>เรียน คุณ{{ $('รับผลการแก้ไข').first().json['ชื่อผู้แจ้ง'] }}</p>\n\n  <p>\n    ระบบได้รับแจ้งผลการแก้ไขเบื้องต้นของท่านแล้ว\n    โดยท่านไม่สามารถแก้ไขปัญหาอุปกรณ์ได้ตามคำแนะนำ\n  </p>\n\n  <div style=\"background-color: #f3f6fb; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #1d4ed8;\">รายละเอียดการแจ้งซ่อม</h3>\n\n    <p><strong>อุปกรณ์:</strong> {{ $('Get row(s) in sheet1').first().json['อุปกรณ์'] }}</p>\n    <p><strong>หมายเลขเครื่อง:</strong> {{ $('Get row(s) in sheet1').first().json['หมายเลขเครื่อง'] }}</p>\n    <p><strong>สถานที่:</strong> {{ $('Get row(s) in sheet1').first().json['สถานที่'] }}</p>\n    <p><strong>อาการเสีย:</strong> {{ $('Get row(s) in sheet1').first().json['อาการเสีย'] }}</p>\n\n    <p>\n      <strong>สถานะ:</strong>\n      <span style=\"color: #b45309; font-weight: bold;\">รอซ่อม</span>\n    </p>\n  </div>\n\n  <div style=\"background-color: #fff7ed; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 18px 0; border-radius: 4px;\">\n    <strong style=\"color: #9a3412;\">ขั้นตอนต่อไป</strong>\n    <p style=\"margin-bottom: 0;\">\n      ระบบจะส่งต่อข้อมูลให้ผู้รับผิดชอบตรวจสอบและดำเนินการซ่อมแซมต่อไป\n    </p>\n  </div>\n\n  <div style=\"border: 1px solid #fecaca; padding: 12px 16px; border-radius: 8px; margin: 18px 0;\">\n    <p style=\"margin: 0; color: #b91c1c;\">\n      <strong>ข้อควรระวัง:</strong>\n      หากอุปกรณ์มีความผิดปกติที่อาจก่อให้เกิดอันตราย\n      โปรดหยุดใช้งานและหลีกเลี่ยงการซ่อมแซมด้วยตนเอง\n    </p>\n  </div>\n\n  <p>ขอขอบคุณที่แจ้งผลการแก้ไข</p>\n\n  <p style=\"margin-top: 24px;\">\n    ขอแสดงความนับถือ<br>\n    <strong>ระบบแจ้งซ่อมอุปกรณ์การเรียนที่เสียหรือไม่พร้อมใช้งาน</strong>\n  </p>\n\n  <hr style=\"border: 0; border-top: 1px solid #ddd; margin-top: 24px;\">\n\n  <p style=\"font-size: 12px; color: #777;\">\n    อีเมลฉบับนี้ส่งโดยระบบอัตโนมัติ กรุณาอย่าตอบกลับอีเมลฉบับนี้\n  </p>\n\n</div>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        624
+      ],
+      "id": "64fce1a1-48da-44ad-b7fb-cb7bfb510bf5",
+      "name": "Email แจ้งผลการดำเนินการ",
+      "webhookId": "7cf8b0bd-f406-43c0-be98-06656343d16d",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "cmuxngkhotr@gmail.com",
+        "toEmail": "cmuxngkhotr@gmail.com",
+        "subject": "แจ้งผลการแก้ไขปัญหาอุปกรณ์เบื้องต้น",
+        "html": "=<div style=\"font-family: Arial, Tahoma, sans-serif; color: #333; line-height: 1.7; max-width: 650px; margin: 0 auto; padding: 20px;\">\n\n  <h2 style=\"color: #2563eb; margin-bottom: 8px;\">\n    แจ้งผลการแก้ไขปัญหาอุปกรณ์\n  </h2>\n\n  <p>เรียน ผู้ดูแลระบบ</p>\n\n  <p>\n    ระบบแจ้งซ่อมอุปกรณ์การเรียนขอแจ้งผลการดำเนินการเบื้องต้น\n    จากผู้แจ้ง โดยมีรายละเอียดดังต่อไปนี้\n  </p>\n\n  <div style=\"background-color: #f3f6fb; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #1d4ed8;\">รายละเอียดการแจ้งซ่อม</h3>\n\n    <p><strong>ชื่อผู้แจ้ง:</strong> {{ $('รับผลการแก้ไข').first().json['ชื่อผู้แจ้ง'] }}</p>\n    <p><strong>อีเมล:</strong> {{ $('รับผลการแก้ไข').first().json['อีเมล'] }}</p>\n    <p><strong>อุปกรณ์:</strong> {{ $('รับผลการแก้ไข').first().json['อุปกรณ์ที่แจ้งปัญหา'] }}</p>\n    <p><strong>หมายเลขเครื่อง:</strong> {{ $('รับผลการแก้ไข').first().json['หมายเลขเครื่อง'] }}</p>\n    <p><strong>อาการเสีย:</strong> {{ $('รับผลการแก้ไข').first().json['อาการเสีย'] }}</p>\n  </div>\n\n  <div style=\"border: 1px solid #bbf7d0; padding: 16px; border-radius: 8px; margin: 18px 0;\">\n    <h3 style=\"margin-top: 0; color: #15803d;\">ผลการดำเนินการ</h3>\n\n    <p>\n      <strong>ผลการแก้ไขเบื้องต้น:</strong>\n      {{ $('รับผลการแก้ไข').first().json['ผลการแก้ไขเบื้องต้น'] }}\n    </p>\n\n    <p>\n      <strong>รายละเอียดเพิ่มเติม:</strong>\n      {{ $('รับผลการแก้ไข').first().json['รายละเอียดเพิ่มเติม (ถ้ามี)'] || 'ไม่มีข้อมูลเพิ่มเติม' }}\n    </p>\n\n    <p>\n      <strong>สถานะ:</strong>\n      <span style=\"color: #b45309; font-weight: bold;\">รอตรวจสอบผล</span>\n    </p>\n  </div>\n\n  <p>โปรดตรวจสอบข้อมูลและปรับปรุงสถานะการแจ้งซ่อมในระบบตามความเหมาะสม</p>\n\n  <p style=\"margin-top: 24px;\">\n    ขอขอบคุณ<br>\n    <strong>ระบบแจ้งซ่อมอุปกรณ์การเรียนอัตโนมัติ</strong>\n  </p>\n\n  <hr style=\"border: 0; border-top: 1px solid #ddd; margin-top: 24px;\">\n\n  <p style=\"font-size: 12px; color: #777;\">\n    อีเมลฉบับนี้ส่งโดยระบบอัตโนมัติ กรุณาตรวจสอบข้อมูลก่อนดำเนินการ\n  </p>\n\n</div>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        432
+      ],
+      "id": "d83de741-d4d1-4548-b04a-ddd76d533f3d",
+      "name": "Email แอดมิน2",
+      "webhookId": "3614c0d4-75a7-4c37-a81e-d8a03622a276",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้ - สำหรับระบบ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ชื่อผู้แจ้ง": "={{ $('Code in JavaScript').item.json['ชื่อผู้แจ้ง'] }}",
+            "อีเมล": "={{ $('Code in JavaScript').item.json['อีเมล'] }}",
+            "อุปกรณ์": "={{ $('Code in JavaScript').item.json['อุปกรณ์'] }}",
+            "หมายเลขเครื่อง": "={{ $('Code in JavaScript').item.json['หมายเลขเครื่อง'] }}",
+            "สถานที่": "={{ $('Code in JavaScript').item.json['สถานที่'] }}",
+            "อาการเสีย": "={{ $('Code in JavaScript').item.json['อาการเสีย'] }}",
+            "ความเร่งด่วน": "={{ $('Code in JavaScript').item.json['ความเร่งด่วน'] }}",
+            "รายละเอียด": "={{ $('Code in JavaScript').item.json['รายละเอียด'] }}",
+            "สถานะ": "={{ $('Code in JavaScript').item.json['สถานะ'] }}",
+            "ผลการดำเนินงาน": "={{ $('Code in JavaScript').item.json['ผลการดำเนินงาน'] }}",
+            "ส่งต่อผู้รับผิดชอบหรือไม่": "={{ $('Code in JavaScript').item.json['ต้องส่งต่อผู้รับผิดชอบ'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ชื่อผู้แจ้ง",
+              "displayName": "ชื่อผู้แจ้ง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "อีเมล",
+              "displayName": "อีเมล",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "อุปกรณ์",
+              "displayName": "อุปกรณ์",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "หมายเลขเครื่อง",
+              "displayName": "หมายเลขเครื่อง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "สถานที่",
+              "displayName": "สถานที่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "อาการเสีย",
+              "displayName": "อาการเสีย",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ความเร่งด่วน",
+              "displayName": "ความเร่งด่วน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "รายละเอียด",
+              "displayName": "รายละเอียด",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "สถานะ",
+              "displayName": "สถานะ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ผลการดำเนินงาน",
+              "displayName": "ผลการดำเนินงาน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "displayName": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1536,
+        -256
+      ],
+      "id": "43967c8d-62d0-455f-93ad-e734d033e5d9",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "cmuxngkhotr@gmail.com",
+        "toEmail": "cmuxngkhotr@gmail.com",
+        "subject": "รายงานสรุปการแจ้งปัญหาอุปกรณ์เทคโนโลยี",
+        "html": "=<!DOCTYPE html>\n<html lang=\"th\">\n<head>\n  <meta charset=\"UTF-8\">\n</head>\n<body style=\"margin:0;padding:24px;background-color:#f3f6fa;font-family:Tahoma,Arial,sans-serif;color:#263238;\">\n  <div style=\"max-width:900px;margin:0 auto;background:#ffffff;border:1px solid #dce3eb;border-radius:12px;overflow:hidden;\">\n\n    <div style=\"background:#174a7e;color:#ffffff;padding:24px;\">\n      <h2 style=\"margin:0;font-size:23px;\">รายงานสรุปการแจ้งซ่อมอุปกรณ์</h2>\n      <p style=\"margin:8px 0 0;font-size:14px;\">ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์เทคโนโลยี</p>\n    </div>\n\n    <div style=\"padding:24px;\">\n      <p>เรียน ผู้ดูแลระบบ (Admin)</p>\n      <p>รายงานสรุปข้อมูลการแจ้งซ่อมจากระบบประจำสัปดาห์ มีรายละเอียดดังต่อไปนี้</p>\n\n      <div style=\"background:#edf4fb;border-radius:8px;padding:18px;margin:20px 0;\">\n        <div style=\"font-size:14px;color:#526579;\">รายการแจ้งซ่อมทั้งหมด</div>\n        <div style=\"font-size:32px;font-weight:bold;color:#174a7e;margin-top:5px;\">\n          {{ $json.total }} รายการ\n        </div>\n      </div>\n\n      <h3 style=\"color:#174a7e;\">1. สรุปรายการตามสถานะ</h3>\n      <table style=\"width:100%;border-collapse:collapse;margin-bottom:24px;\">\n        <thead>\n          <tr style=\"background:#edf3f8;\">\n            <th style=\"border:1px solid #d6dce5;padding:10px;text-align:left;\">สถานะ</th>\n            <th style=\"border:1px solid #d6dce5;padding:10px;text-align:center;\">จำนวนรายการ</th>\n          </tr>\n        </thead>\n        <tbody>\n          {{\n            Object.entries($json.statusCounts || {})\n              .map(([name, count]) =>\n                `<tr>\n                  <td style=\"border:1px solid #d6dce5;padding:10px;\">${name}</td>\n                  <td style=\"border:1px solid #d6dce5;padding:10px;text-align:center;\">${count}</td>\n                </tr>`\n              ).join('')\n          }}\n        </tbody>\n      </table>\n\n      <h3 style=\"color:#174a7e;\">2. สรุปรายการตามระดับความเร่งด่วน</h3>\n      <table style=\"width:100%;border-collapse:collapse;margin-bottom:24px;\">\n        <thead>\n          <tr style=\"background:#edf3f8;\">\n            <th style=\"border:1px solid #d6dce5;padding:10px;text-align:left;\">ระดับความเร่งด่วน</th>\n            <th style=\"border:1px solid #d6dce5;padding:10px;text-align:center;\">จำนวนรายการ</th>\n          </tr>\n        </thead>\n        <tbody>\n          {{\n            Object.entries($json.urgencyCounts || {})\n              .map(([name, count]) =>\n                `<tr>\n                  <td style=\"border:1px solid #d6dce5;padding:10px;\">${name}</td>\n                  <td style=\"border:1px solid #d6dce5;padding:10px;text-align:center;\">${count}</td>\n                </tr>`\n              ).join('')\n          }}\n        </tbody>\n      </table>\n\n      <h3 style=\"color:#174a7e;\">3. รายละเอียดรายการแจ้งซ่อม</h3>\n      <p style=\"font-size:13px;color:#607080;\">โปรดตรวจสอบรายการและติดตามสถานะการดำเนินงานตามความเหมาะสม</p>\n\n      <p style=\"margin-top:28px;\">ขอแสดงความนับถือ<br><strong>ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์อัตโนมัติ</strong></p>\n    </div>\n\n    <div style=\"background:#f3f6fa;padding:14px 24px;font-size:12px;color:#718096;\">\n      อีเมลฉบับนี้สร้างโดยระบบ n8n อัตโนมัติ กรุณาตรวจสอบข้อมูลใน Google Sheets หากต้องการรายละเอียดรายการแจ้งซ่อม\n    </div>\n  </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -608,
+        1312
+      ],
+      "id": "8e4b959f-58b0-4c09-b138-0344cc95c923",
+      "name": "Email แอดมิน3",
+      "webhookId": "3614c0d4-75a7-4c37-a81e-d8a03622a276",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้ - สำหรับระบบ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "หมายเลขเครื่อง",
+              "lookupValue": "={{ $json['หมายเลขอุปกรณ์'] }}"
+            },
+            {
+              "lookupColumn": "สถานที่",
+              "lookupValue": "={{ $json[\"ห้องเรียน\"] }}"
+            },
+            {
+              "lookupColumn": "อาการเสีย",
+              "lookupValue": "={{ $json[\"อาการ/ปัญหาที่พบ\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1184,
+        16
+      ],
+      "id": "e1dab632-4b4b-4d7a-937f-6b6f3d8278d9",
+      "name": "ตรวจรายการซ้ำ",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const current = $('รับแจ้งปัญหา').first().json;\nconst oldRows = $input.all().map(item => item.json);\n\n// ปรับข้อความให้อยู่ในรูปแบบที่เปรียบเทียบได้\nfunction normalize(text) {\n  return String(text ?? '')\n    .toLowerCase()\n    .replace(/\\s+/g, '')\n    .trim();\n}\n\n// จัดชื่ออุปกรณ์ที่เรียกต่างกันให้อยู่ในประเภทเดียวกัน\nfunction deviceType(text) {\n  const t = normalize(text);\n\n  if (/แป้นพิมพ์|คีย์บอร์ด|keyboard/.test(t)) return 'keyboard';\n  if (/เมาส์|เมาส์คอม|mouse/.test(t)) return 'mouse';\n  if (/จอภาพ|จอมอนิเตอร์|monitor/.test(t)) return 'monitor';\n  if (/คอมพิวเตอร์|คอมตั้งโต๊ะ|computer|pc/.test(t)) return 'computer';\n  if (/เครื่องพิมพ์|printer/.test(t)) return 'printer';\n  if (/โปรเจกเตอร์|projector/.test(t)) return 'projector';\n\n  return t;\n}\n\n// จัดอาการที่มีความหมายใกล้เคียงกันเป็นกลุ่ม\nfunction symptomType(text) {\n  const t = normalize(text);\n\n  if (/พิมพ์ไม่ติด|กดไม่ติด|กดแล้วไม่ขึ้น|พิมพ์ไม่ได้|ไม่มีตัวอักษร/.test(t)) {\n    return 'keyboard_not_typing';\n  }\n\n  if (/คลิกไม่ติด|คลิกไม่ได้|กดเมาส์ไม่ได้/.test(t)) {\n    return 'mouse_click_problem';\n  }\n\n  if (/เปิดไม่ติด|เปิดไม่ได้|เปิดไม่ขึ้น/.test(t)) {\n    return 'cannot_turn_on';\n  }\n\n  if (/ภาพไม่ขึ้น|ไม่มีภาพ|จอไม่ติด/.test(t)) {\n    return 'no_display';\n  }\n\n  return t;\n}\n\nconst newDevice = deviceType(current['อุปกรณ์']);\nconst newNumber = normalize(current['หมายเลขเครื่อง']);\nconst newSymptom = symptomType(current['อาการเสีย']);\n\nconst openStatuses = [\n  'รอแก้ไขเบื้องต้น',\n  'รอดำเนินการ',\n  'รอซ่อม',\n  'กำลังดำเนินการ',\n  'ไม่สามารถแก้ไขได้'\n].map(normalize);\n\nconst duplicates = oldRows.filter(row => {\n  // ข้ามแถวว่างที่อาจเกิดจาก Always Output Data\n  if (!row['หมายเลขเครื่อง']) return false;\n\n  const sameNumber =\n    normalize(row['หมายเลขเครื่อง']) === newNumber;\n\n  const sameDevice =\n    deviceType(row['อุปกรณ์']) === newDevice;\n\n  const sameSymptom =\n    symptomType(row['อาการเสีย']) === newSymptom;\n\n  const status = normalize(row['สถานะ']);\n  const stillOpen = openStatuses.includes(status);\n\n  return sameNumber && sameDevice && sameSymptom && stillOpen;\n});\n\nreturn [{\n  json: {\n    ...current,\n    'พบรายการซ้ำ': duplicates.length > 0,\n    'จำนวนรายการที่ตรงกัน': duplicates.length,\n    'รายละเอียดรายการเดิม': duplicates.map(row => ({\n      'หมายเลขเครื่อง': row['หมายเลขเครื่อง'],\n      'อุปกรณ์': row['อุปกรณ์'],\n      'อาการเสีย': row['อาการเสีย'],\n      'สถานะ': row['สถานะ']\n    }))\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1008,
+        16
+      ],
+      "id": "30042fff-78ff-408c-bc94-1fbe7d17b534",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "fromEmail": "67010516010@msu.ac.th",
+        "toEmail": "={{ $json[\"อีเมล\"] }}",
+        "subject": "พบรายการแจ้งซ่อมอุปกรณ์ซ้ำ",
+        "html": "=<div style=\"background:#1e40af;padding:26px 20px;text-align:center;color:#ffffff;\">\n  <h2 style=\"margin:0;font-size:22px;\">แจ้งเตือนการแจ้งซ่อม</h2>\n  <p style=\"margin:8px 0 0;font-size:14px;\">ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์เทคโนโลยี</p>\n</div>\n\n<div style=\"padding:26px 24px;\">\n  <p style=\"margin-top:0;\">เรียน คุณ{{ $json[\"ชื่อผู้แจ้ง\"] }}</p>\n\n  <div style=\"background:#fff7ed;border-left:4px solid #f59e0b;padding:14px 16px;margin:18px 0;\">\n    <strong style=\"color:#92400e;font-size:16px;\">พบรายการแจ้งซ่อมที่อาจซ้ำ</strong>\n    <p style=\"margin:8px 0 0;line-height:1.7;\">ระบบตรวจพบว่าข้อมูลที่ท่านส่งมาอาจตรงกับรายการแจ้งซ่อมที่มีอยู่แล้ว จึงขอให้ตรวจสอบรายละเอียดก่อนดำเนินการแจ้งซ่อมเพิ่มเติม</p>\n  </div>\n\n  <h3 style=\"font-size:16px;color:#1e40af;margin-bottom:12px;\">รายละเอียดการแจ้งปัญหา</h3>\n\n  <table style=\"width:100%;border-collapse:collapse;font-size:14px;\">\n    <tr>\n      <td style=\"padding:11px;background:#f8fafc;border:1px solid #e2e8f0;width:38%;\"><strong>อุปกรณ์</strong></td>\n      <td style=\"padding:11px;border:1px solid #e2e8f0;\">{{ $json[\"ประเภทอุปกรณ์\"] }}</td>\n    </tr>\n    <tr>\n      <td style=\"padding:11px;background:#f8fafc;border:1px solid #e2e8f0;\"><strong>หมายเลขเครื่อง</strong></td>\n      <td style=\"padding:11px;border:1px solid #e2e8f0;\">{{ $json[\"หมายเลขอุปกรณ์\"] }}</td>\n    </tr>\n    <tr>\n      <td style=\"padding:11px;background:#f8fafc;border:1px solid #e2e8f0;\"><strong>อาการเสีย</strong></td>\n      <td style=\"padding:11px;border:1px solid #e2e8f0;\">{{ $json[\"อาการ/ปัญหาที่พบ\"] }}</td>\n    </tr>\n  </table>\n\n  <p style=\"margin-top:22px;line-height:1.8;\">หากเป็นปัญหาเดียวกับรายการเดิม กรุณารอการดำเนินงานจากผู้รับผิดชอบ หากเป็นปัญหาคนละอาการหรือเกิดขึ้นหลังจากรายการเดิมได้รับการแก้ไขแล้ว กรุณาติดต่อผู้รับผิดชอบเพื่อตรวจสอบเพิ่มเติม</p>\n\n  <p style=\"line-height:1.8;\">ขออภัยในความไม่สะดวก และขอบคุณสำหรับความร่วมมือ</p>\n\n  <p style=\"margin-bottom:0;\">ขอแสดงความนับถือ<br><strong>ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์เทคโนโลยี</strong></p>\n</div>\n\n<div style=\"padding:14px 20px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;font-size:12px;color:#64748b;\">\n  อีเมลฉบับนี้จัดส่งโดยระบบอัตโนมัติ\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -624,
+        176
+      ],
+      "id": "41fed5c9-6d76-4611-a1c9-c35ed2b1afd1",
+      "name": "Email อีเมลแจ้งผู้ส่งซ้ำ",
+      "webhookId": "7cf8b0bd-f406-43c0-be98-06656343d16d",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst data = $json;\n\nconst device = String(\n  data[\"ประเภทอุปกรณ์\"] ?? data[\"อุปกรณ์\"] ?? \"\"\n).trim().toLowerCase();\n\nconst problem = String(\n  data[\"อาการ/ปัญหาที่พบ\"] ?? data[\"อาการเสีย\"] ?? \"\"\n).trim();\n\nconst allowedDevices = [\n  \"คอมพิวเตอร์\",\n  \"คอมพิวเตอร์ตั้งโต๊ะ\",\n  \"โน้ตบุ๊ก\",\n  \"แล็ปท็อป\",\n  \"หน้าจอ\",\n  \"จอภาพ\",\n  \"จอมอนิเตอร์\",\n  \"จอมอนิเตอ\",\n  \"โปรเจกเตอร์\",\n  \"โปรเจ็คเตอร์\",\n  \"โปรเจคเตอร์\",\n  \"โปรเจ็กเตอร์\",\n  \"ดปรเจ็คเตอร์\",\n  \"เครื่องฉาย\",\n  \"เมาส์\",\n  \"แป้นพิมพ์\",\n  \"คีย์บอร์ด\",\n  \"เครื่องพิมพ์\",\n  \"ปริ้นเตอร์\",\n  \"สายชาร์จ\",\n  \"อะแดปเตอร์\",\n  \"ลำโพง\",\n  \"ไมโครโฟน\",\n  \"หูฟัง\",\n  \"สาย hdmi\",\n  \"สาย vga\",\n  \"สาย usb\",\n  \"เราเตอร์\",\n  \"router\",\n  \"แท็บเล็ต\",\n  \"ไอแพด\",\n  \"ipad\"\n];\n\nconst isRelevant =\n  device !== \"\" &&\n  allowedDevices.some(item => device.includes(item.toLowerCase())) &&\n  problem !== \"\";\n\nreturn {\n  ...data,\n  \"ข้อมูลเกี่ยวข้องกับอุปกรณ์\": isRelevant,\n  \"ผลตรวจสอบประเภท\": isRelevant ? \"เกี่ยวข้อง\" : \"ไม่เกี่ยวข้อง\"\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -624,
+        0
+      ],
+      "id": "179a0114-f7d2-4842-8fca-f2ee2c926072",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "fromEmail": "67010516010@msu.ac.th",
+        "toEmail": "={{ $json[\"อีเมล\"] }}",
+        "subject": "แจ้งผลการตรวจสอบข้อมูลแจ้งซ่อมอุปกรณ์เทคโนโลยี",
+        "html": "=<div style=\"padding:26px 24px;line-height:1.8;\">\n  <p>เรียน คุณ{{ $('รับแจ้งปัญหา').first().json['ชื่อผู้แจ้ง'] || 'ผู้แจ้งปัญหา' }}</p>\n\n  <p>ระบบได้รับข้อมูลแจ้งปัญหาของท่านแล้ว แต่จากการตรวจสอบเบื้องต้น พบว่าข้อมูลดังกล่าวไม่อยู่ในประเภทอุปกรณ์อิเล็กทรอนิกส์หรืออุปกรณ์เทคโนโลยีที่ระบบรองรับ</p>\n\n  <div style=\"background:#fff7e8;border-left:4px solid #e9a23b;padding:16px;margin:20px 0;border-radius:5px;\">\n    <strong style=\"color:#925d0a;\">ผลการตรวจสอบ: ไม่ผ่านเกณฑ์</strong>\n    <p style=\"margin:8px 0 0;\">ข้อมูลนี้จะไม่ถูกส่งเข้าสู่กระบวนการวิเคราะห์ด้วย AI และจะไม่ถูกบันทึกเป็นรายการแจ้งซ่อม</p>\n  </div>\n\n  <h3 style=\"font-size:16px;color:#2457a7;\">ข้อมูลที่ท่านส่งมา</h3>\n  <table style=\"width:100%;border-collapse:collapse;font-size:14px;\">\n    <tr>\n      <td style=\"padding:10px;border:1px solid #e1e7ef;background:#f7f9fc;width:38%;\">ประเภทอุปกรณ์</td>\n      <td style=\"padding:10px;border:1px solid #e1e7ef;\">{{ $('รับแจ้งปัญหา').first().json['ประเภทอุปกรณ์'] || '-' }}</td>\n    </tr>\n    <tr>\n      <td style=\"padding:10px;border:1px solid #e1e7ef;background:#f7f9fc;\">หมายเลขอุปกรณ์</td>\n      <td style=\"padding:10px;border:1px solid #e1e7ef;\">{{ $('รับแจ้งปัญหา').first().json['หมายเลขอุปกรณ์'] || '-' }}</td>\n    </tr>\n    <tr>\n      <td style=\"padding:10px;border:1px solid #e1e7ef;background:#f7f9fc;\">อาการหรือปัญหา</td>\n      <td style=\"padding:10px;border:1px solid #e1e7ef;\">{{ $('รับแจ้งปัญหา').first().json['อาการ/ปัญหาที่พบ'] || '-' }}</td>\n    </tr>\n  </table>\n\n  <p style=\"margin-top:22px;\">กรุณาตรวจสอบและส่งแบบฟอร์มใหม่ โดยเลือกอุปกรณ์อิเล็กทรอนิกส์หรืออุปกรณ์เทคโนโลยีที่ใช้ในการเรียน เช่น คอมพิวเตอร์ เมาส์ แป้นพิมพ์ จอภาพ โปรเจกเตอร์ หรือสายชาร์จ พร้อมระบุอาการเสียให้ชัดเจน</p>\n\n  <p style=\"margin-top:24px;\">ขอขอบคุณที่ใช้บริการ</p>\n  <p style=\"margin-bottom:0;color:#5d6b7c;font-size:13px;\">ระบบแจ้งซ่อมอุปกรณ์เทคโนโลยี</p>\n</div>\n\n<div style=\"background:#f7f9fc;border-top:1px solid #e1e7ef;padding:14px;text-align:center;color:#7b8796;font-size:12px;\">\n  อีเมลฉบับนี้ส่งโดยระบบอัตโนมัติ กรุณาตรวจสอบข้อมูลก่อนส่งแบบฟอร์มใหม่\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -176,
+        160
+      ],
+      "id": "343ed465-9e1c-46dc-9aca-9dbc85e5e071",
+      "name": "Email อีเมลแจ้งอุปกรณ์ไม่เกี่ยวข้อง",
+      "webhookId": "7cf8b0bd-f406-43c0-be98-06656343d16d",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"พบรายการซ้ำ\"] }}",
+                    "rightValue": false,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "b8b56610-d25d-4f40-855b-c5bf19c1404c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "รายการใหม่"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c787b2dd-e8de-419d-9efc-a854864b0da7",
+                    "leftValue": "={{ $json[\"พบรายการซ้ำ\"] }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "รายการซ้ำ"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -816,
+        16
+      ],
+      "id": "00210234-d0f6-4b43-9d81-457dbeb0213f",
+      "name": "ตรวจรายการซ้ำ/ไม่ซ้ำ"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"ข้อมูลเกี่ยวข้องกับอุปกรณ์\"] }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "b8b56610-d25d-4f40-855b-c5bf19c1404c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "เกี่ยวข้อง"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c787b2dd-e8de-419d-9efc-a854864b0da7",
+                    "leftValue": "={{ $json[\"ข้อมูลเกี่ยวข้องกับอุปกรณ์\"] }}",
+                    "rightValue": false,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ไม่เกี่ยวข้อง"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        0
+      ],
+      "id": "e319eea3-1357-4716-935a-a7445cf6fdcf",
+      "name": "ตรวจรายการเกี่ยว/ไม่เกี่ยวข้อง"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -1344,
+        1312
+      ],
+      "id": "fa5d4758-28e6-4e7c-9117-add2ea6e4fb9",
+      "name": "สรุปข้อมูลของแอดมิน"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งอุปกรณ์การเรียนที่เสีย/ไม่พร้อมใช้ - สำหรับระบบ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ชื่อผู้แจ้ง",
+              "lookupValue": "={{ $json[\"ชื่อผู้แจ้ง\"] }}"
+            },
+            {
+              "lookupColumn": "หมายเลขเครื่อง",
+              "lookupValue": "={{ $json[\"หมายเลขเครื่อง\"] }}"
+            },
+            {
+              "lookupColumn": "อุปกรณ์",
+              "lookupValue": "={{ $json[\"อุปกรณ์\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1104,
+        944
+      ],
+      "id": "5b1f0c3a-ae51-417a-b2c2-9770b6680f00",
+      "name": "Get row(s) in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "แบบฟอร์มแจ้งผลการดำเนินการซ่อมอุปกรณ์เทคโนโลยี",
+        "formDescription": "กรอกข้อมูลหลังจากตรวจสอบหรือดำเนินการซ่อมอุปกรณ์ที่ได้รับแจ้ง",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "ชื่อผู้แจ้ง"
+            },
+            {
+              "fieldLabel": "อีเมล"
+            },
+            {
+              "fieldLabel": "อุปกรณ์"
+            },
+            {
+              "fieldLabel": "หมายเลขเครื่อง"
+            },
+            {
+              "fieldLabel": "ผลการดำเนินงาน",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "ซ่อมเสร็จแล้ว ใช้งานได้ตามปกติ"
+                  },
+                  {
+                    "option": "ไม่สามารถซ่อมได้ ต้องส่งต่อช่างหรือผู้เชี่ยวชาญ"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "สถานะล่าสุด",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "ซ่อมเสร็จแล้ว"
+                  },
+                  {
+                    "option": "ส่งต่อผู้รับผิดชอบ"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -1344,
+        944
+      ],
+      "id": "948b9662-425a-412e-a67d-49464b77918f",
+      "name": "แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)",
+      "webhookId": "5915ac7b-bb80-41ec-8f04-0bf18afe84ea"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').item.json['ผลการดำเนินงาน'] }}",
+                    "rightValue": "=ซ่อมเสร็จแล้ว ใช้งานได้ตามปกติ",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1eb7688c-ebc3-40b1-a65f-7fbcc598df34"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ซ่อมเสร็จแล้ว "
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "241acd2a-33d1-4fa8-838e-95eccf8688d9",
+                    "leftValue": "={{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').item.json['ผลการดำเนินงาน'] }}",
+                    "rightValue": "ไม่สามารถซ่อมได้ ต้องส่งต่อช่างหรือผู้เชี่ยวชาญ",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ส่งต่อช่าง"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        944
+      ],
+      "id": "7a42406c-2e17-417c-a352-05cc0ebbc73e",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์เทคโนโลยีชำรุดหรือไม่พร้อมใช้งาน",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ผลการดำเนินงาน": "={{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').item.json['ผลการดำเนินงาน'] }}",
+            "สถานะ": "={{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').item.json['สถานะล่าสุด'] }}",
+            "ชื่อผู้แจ้ง": "={{ $('Get row(s) in sheet2').item.json['ชื่อผู้แจ้ง'] }}",
+            "หมายเลขเครื่อง": "={{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').item.json['หมายเลขเครื่อง'] }}",
+            "รายละเอียด": "={{ $('Get row(s) in sheet2').item.json['รายละเอียด'] }}"
+          },
+          "matchingColumns": [
+            "ชื่อผู้แจ้ง"
+          ],
+          "schema": [
+            {
+              "id": "ชื่อผู้แจ้ง",
+              "displayName": "ชื่อผู้แจ้ง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "อีเมล",
+              "displayName": "อีเมล",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "อุปกรณ์",
+              "displayName": "อุปกรณ์",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "หมายเลขเครื่อง",
+              "displayName": "หมายเลขเครื่อง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "สถานที่",
+              "displayName": "สถานที่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "อาการเสีย",
+              "displayName": "อาการเสีย",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ความเร่งด่วน",
+              "displayName": "ความเร่งด่วน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "รายละเอียด",
+              "displayName": "รายละเอียด",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "สถานะ",
+              "displayName": "สถานะ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ผลการดำเนินงาน",
+              "displayName": "ผลการดำเนินงาน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "displayName": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -624,
+        864
+      ],
+      "id": "40f642c8-30e1-4570-a07c-46e4aef7fd6b",
+      "name": "Update row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "cmuxngkhotr@gmail.com",
+        "toEmail": "={{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').item.json['อีเมล'] }}",
+        "subject": "แจ้งผลการดำเนินการซ่อมอุปกรณ์",
+        "html": "=```html\n<div style=\"font-family: Arial, Tahoma, sans-serif; max-width: 650px; margin: auto; color: #333; line-height: 1.7; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;\">\n\n  <div style=\"background-color: #2457a7; color: white; padding: 22px; text-align: center;\">\n    <h2 style=\"margin: 0;\">แจ้งผลการดำเนินการซ่อมอุปกรณ์เทคโนโลยี</h2>\n    <p style=\"margin: 6px 0 0;\">ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์</p>\n  </div>\n\n  <div style=\"padding: 25px;\">\n    <p>เรียน คุณ{{ $('Get row(s) in sheet2').first().json['ชื่อผู้แจ้ง'] }}</p>\n\n    <p>ระบบขอแจ้งผลการดำเนินการซ่อมอุปกรณ์การเรียนตามที่ท่านได้แจ้งปัญหาไว้ โดยมีรายละเอียดดังนี้</p>\n\n    <table style=\"width: 100%; border-collapse: collapse; margin: 18px 0;\">\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd; width: 35%;\"><b>อุปกรณ์</b></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Get row(s) in sheet2').first().json['อุปกรณ์'] }}</td>\n      </tr>\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd;\"><b>หมายเลขเครื่อง</b></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Get row(s) in sheet2').first().json['หมายเลขเครื่อง'] }}</td>\n      </tr>\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd;\"><b>สถานที่</b></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Get row(s) in sheet2').first().json['สถานที่'] }}</td>\n      </tr>\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd;\"><b>อาการเสีย</b></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Get row(s) in sheet2').first().json['อาการเสีย'] }}</td>\n      </tr>\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd;\"><b>ผลการดำเนินงาน</b></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').first().json['ผลการดำเนินงาน'] }}</td>\n      </tr>\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd;\"><b>สถานะล่าสุด</b></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\"><b>{{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').first().json['ผลการดำเนินงาน'] === 'ซ่อมเสร็จแล้ว ใช้งานได้ตามปกติ' ? 'ซ่อมเสร็จแล้ว' : 'ส่งต่อผู้รับผิดชอบ' }}</b></td>\n      </tr>\n    </table>\n\n    <p>ขอขอบคุณที่แจ้งปัญหาให้ระบบทราบ หากอุปกรณ์ยังไม่สามารถใช้งานได้ตามปกติ กรุณาติดต่อเจ้าหน้าที่ผู้รับผิดชอบ</p>\n\n    <p style=\"margin-top: 25px;\">ขอแสดงความนับถือ<br><b>ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์เทคโนโลยี</b></p>\n  </div>\n\n  <div style=\"background: #f2f5f9; padding: 12px; text-align: center; color: #777; font-size: 12px;\">\n    อีเมลฉบับนี้ส่งโดยระบบอัตโนมัติ กรุณาเก็บไว้เป็นหลักฐาน\n  </div>\n</div>\n```",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -416,
+        864
+      ],
+      "id": "5ba52271-3496-4ebb-a2cf-36d3eb56dd1b",
+      "name": "Email แจ้งผลการซ่อม",
+      "webhookId": "7cf8b0bd-f406-43c0-be98-06656343d16d",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "cmuxngkhotr@gmail.com",
+        "toEmail": "={{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').item.json['อีเมล'] }}",
+        "subject": "แจ้งผลการดำเนินการซ่อมอุปกรณ์",
+        "html": "=```html\n<div style=\"font-family: Arial, Tahoma, sans-serif; max-width: 650px; margin: auto; color: #333; line-height: 1.7; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;\">\n\n  <div style=\"background-color: #b45309; color: white; padding: 22px; text-align: center;\">\n    <h2 style=\"margin: 0;\">แจ้งผลการดำเนินการซ่อมอุปกรณ์เทคโนโลยี</h2>\n    <p style=\"margin: 6px 0 0;\">ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์</p>\n  </div>\n\n  <div style=\"padding: 25px;\">\n    <p>เรียน คุณ{{ $('Get row(s) in sheet2').first().json['ชื่อผู้แจ้ง'] }}</p>\n\n    <p>ระบบขอแจ้งให้ทราบว่า เจ้าหน้าที่ได้ตรวจสอบปัญหาอุปกรณ์ที่ท่านแจ้งแล้ว แต่ยังไม่สามารถดำเนินการซ่อมให้กลับมาใช้งานได้ตามปกติ จึงจำเป็นต้องส่งต่อช่างหรือผู้เชี่ยวชาญเพื่อดำเนินการต่อไป</p>\n\n    <div style=\"background-color: #fff7ed; border-left: 5px solid #b45309; padding: 15px; margin: 20px 0;\">\n      <strong style=\"color: #92400e;\">สถานะ: ส่งต่อผู้รับผิดชอบ</strong>\n      <p style=\"margin: 6px 0 0;\">ขณะนี้อยู่ระหว่างการส่งต่อเพื่อให้ผู้เชี่ยวชาญตรวจสอบและดำเนินการแก้ไขเพิ่มเติม</p>\n    </div>\n\n    <h3 style=\"color: #2457a7;\">รายละเอียดการแจ้งซ่อม</h3>\n\n    <table style=\"width: 100%; border-collapse: collapse; margin: 15px 0;\">\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd; width: 35%;\"><strong>อุปกรณ์</strong></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Get row(s) in sheet2').first().json['อุปกรณ์'] }}</td>\n      </tr>\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd;\"><strong>หมายเลขเครื่อง</strong></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Get row(s) in sheet2').first().json['หมายเลขเครื่อง'] }}</td>\n      </tr>\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd;\"><strong>สถานที่</strong></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Get row(s) in sheet2').first().json['สถานที่'] }}</td>\n      </tr>\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd;\"><strong>อาการเสีย</strong></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Get row(s) in sheet2').first().json['อาการเสีย'] }}</td>\n      </tr>\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd;\"><strong>ผลการดำเนินงาน</strong></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').first().json['ผลการดำเนินงาน'] }}</td>\n      </tr>\n      <tr>\n        <td style=\"padding: 10px; background: #f2f5f9; border: 1px solid #ddd;\"><strong>สถานะล่าสุด</strong></td>\n        <td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>ส่งต่อผู้รับผิดชอบ</strong></td>\n      </tr>\n    </table>\n\n    <p><strong>ขั้นตอนต่อไป:</strong> เจ้าหน้าที่จะประสานงานกับช่างหรือผู้เชี่ยวชาญเพื่อดำเนินการตรวจสอบและแก้ไขเพิ่มเติม หากมีความคืบหน้าจะมีการแจ้งให้ทราบตามขั้นตอนของระบบ</p>\n\n    <p>ขออภัยในความไม่สะดวก และขอขอบคุณที่แจ้งปัญหาให้ระบบทราบ</p>\n\n    <p style=\"margin-top: 25px;\">ขอแสดงความนับถือ<br><strong>ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์เทคโนโลยี</strong></p>\n  </div>\n\n  <div style=\"background: #f2f5f9; padding: 12px; text-align: center; color: #777; font-size: 12px;\">\n    อีเมลฉบับนี้ส่งโดยระบบอัตโนมัติ กรุณาเก็บไว้เป็นหลักฐาน\n  </div>\n</div>\n```",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -416,
+        1072
+      ],
+      "id": "83b53ca4-cb3a-46a6-a2f8-c225c645287c",
+      "name": "Email แจ้งผลการซ่อม2",
+      "webhookId": "7cf8b0bd-f406-43c0-be98-06656343d16d",
+      "credentials": {
+        "smtp": {
+          "id": "YLQ8SnfpLH4wKfSC",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM",
+          "mode": "list",
+          "cachedResultName": "ระบบแจ้งปัญหาและติดตามการซ่อมอุปกรณ์เทคโนโลยีชำรุดหรือไม่พร้อมใช้งาน",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19_4CibqnC94F2ESdgnVs9igntdK8RL4pJfkPX-_-xiM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ผลการดำเนินงาน": "={{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').item.json['ผลการดำเนินงาน'] }}",
+            "สถานะ": "={{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').item.json['สถานะล่าสุด'] }}",
+            "ชื่อผู้แจ้ง": "={{ $('Get row(s) in sheet2').item.json['ชื่อผู้แจ้ง'] }}",
+            "หมายเลขเครื่อง": "={{ $('แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)').item.json['หมายเลขเครื่อง'] }}",
+            "รายละเอียด": "={{ $('Get row(s) in sheet2').item.json['รายละเอียด'] }}"
+          },
+          "matchingColumns": [
+            "ชื่อผู้แจ้ง"
+          ],
+          "schema": [
+            {
+              "id": "ชื่อผู้แจ้ง",
+              "displayName": "ชื่อผู้แจ้ง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "อีเมล",
+              "displayName": "อีเมล",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "อุปกรณ์",
+              "displayName": "อุปกรณ์",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "หมายเลขเครื่อง",
+              "displayName": "หมายเลขเครื่อง",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "สถานที่",
+              "displayName": "สถานที่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "อาการเสีย",
+              "displayName": "อาการเสีย",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ความเร่งด่วน",
+              "displayName": "ความเร่งด่วน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "รายละเอียด",
+              "displayName": "รายละเอียด",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "สถานะ",
+              "displayName": "สถานะ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ผลการดำเนินงาน",
+              "displayName": "ผลการดำเนินงาน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "displayName": "ส่งต่อผู้รับผิดชอบหรือไม่",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -624,
+        1072
+      ],
+      "id": "8cde5b67-afc4-43e7-a19f-d309be24b333",
+      "name": "Update row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lxBnwN9eS5ZDdBaG",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Email แอดมิน3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email แอดมิน": {
+      "main": [
+        [
+          {
+            "node": "Email ยืนยันผู้แจ้งซ่อม",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email ยืนยันผู้แจ้งซ่อม": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Email แอดมิน",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email แอดมิน1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email แอดมิน1": {
+      "main": [
+        [
+          {
+            "node": "Email ยืนยันผู้แจ้งซ่อม1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email ยืนยันผู้แจ้งซ่อม1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "รับแจ้งปัญหา": {
+      "main": [
+        [
+          {
+            "node": "ตรวจรายการซ้ำ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "รับผลการแก้ไข": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Email แจ้งผลการดำเนินการ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email แจ้งผลการดำเนินการ": {
+      "main": [
+        []
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Email แอดมิน2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email แอดมิน3": {
+      "main": [
+        []
+      ]
+    },
+    "ตรวจรายการซ้ำ": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "ตรวจรายการซ้ำ/ไม่ซ้ำ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "ตรวจรายการเกี่ยว/ไม่เกี่ยวข้อง",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ตรวจรายการซ้ำ/ไม่ซ้ำ": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email อีเมลแจ้งผู้ส่งซ้ำ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ตรวจรายการเกี่ยว/ไม่เกี่ยวข้อง": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email อีเมลแจ้งอุปกรณ์ไม่เกี่ยวข้อง",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "สรุปข้อมูลของแอดมิน": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "แจ้งผลการดำเนินการซ่อมอุปกรณ์ (แอดมิน)": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Email แจ้งผลการซ่อม",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet3": {
+      "main": [
+        [
+          {
+            "node": "Email แจ้งผลการซ่อม2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3369a264-891b-4060-b1c7-e0ee93673f8e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b41da7af670877a8dcbd613181fb81d2d70b672a0e668dfd95c22eeb9681b7fc"
+  },
+  "nodeGroups": [],
+  "id": "EiLpeSQtuXM9bLCD",
+  "tags": []
+}
